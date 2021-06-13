@@ -7,13 +7,13 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 
 import java.util.List;
 
-import ru.reactiveturtle.reflectthebullet.general.screens.world.visualmanagers.VisualManager;
+import ru.reactiveturtle.reflectthebullet.base.Renderable;
 import ru.reactiveturtle.reflectthebullet.objects.StaticObject;
 
 public interface Keeper {
     void putBackground(List<Sprite> backList);
 
-    void addVisualManager(VisualManager visualManager);
+    void addVisualManager(Renderable renderable);
 
     void setScoreTableParams(Color textColor, int y);
 

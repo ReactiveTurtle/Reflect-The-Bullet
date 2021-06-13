@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -17,17 +16,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.reactiveturtle.reflectthebullet.general.helpers.PixmapHelper;
-import ru.reactiveturtle.reflectthebullet.general.screens.world.visualmanagers.CloudsManager;
 import ru.reactiveturtle.reflectthebullet.objects.StaticObject;
 import ru.reactiveturtle.reflectthebullet.objects.reflectors.BoxReflector;
 import ru.reactiveturtle.reflectthebullet.objects.reflectors.RectangleReflector;
 import ru.reactiveturtle.reflectthebullet.objects.reflectors.TriangleReflector;
 import ru.reactiveturtle.reflectthebullet.objects.targets.TrainTarget;
 
-import static ru.reactiveturtle.reflectthebullet.general.GameData.height;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.width;
 
-public abstract class Levels {
+public final class Levels {
+    private Levels() {
+    }
+
     public static class Level_desert_open1 implements Level {
         @Override
         public void loadTo(Keeper keeper, World world) {
@@ -167,7 +166,7 @@ public abstract class Levels {
 
             Texture texture = new Texture(Gdx.files.internal("target.png"));
             TrainTarget target = new TrainTarget(width() / 24f, width() / 4f, texture);
-            target.setPosition(width() - target.getWidth(), blockHeight * 12);
+            target.setPosition(width() - target.getWidth(), blockHeight * 4);
             target.createBody(world);
             staticObjects.add(target);
 
@@ -292,7 +291,7 @@ public abstract class Levels {
             for (int i = 0; i < 4; i++) {
                 pixmap.drawPixmap(src, sandBlockTexture.getWidth() * i, 0);
             }
-            RectangleReflector reflector = new RectangleReflector(new Texture(pixmap));
+            RectangleReflector reflector = new RectangleReflector(new Texture(pixmap), oneMeter);
             reflector.setSize(blockWidth * 4, blockHeight);
             reflector.setPosition(width() / 2f, blockHeight * 7);
             reflector.createBody(world);
@@ -302,7 +301,7 @@ public abstract class Levels {
             for (int i = 0; i < 7; i++) {
                 pixmap.drawPixmap(src, sandBlockTexture.getWidth() * i, 0);
             }
-            reflector = new RectangleReflector(new Texture(pixmap));
+            reflector = new RectangleReflector(new Texture(pixmap), oneMeter);
             reflector.setSize(blockWidth * 7, blockHeight);
             reflector.setPosition(width() / 4f, blockHeight * 12);
             reflector.createBody(world);

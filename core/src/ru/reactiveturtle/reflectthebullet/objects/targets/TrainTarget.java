@@ -14,8 +14,6 @@ import ru.reactiveturtle.reflectthebullet.Helper;
 import ru.reactiveturtle.reflectthebullet.objects.Physical;
 import ru.reactiveturtle.reflectthebullet.objects.StaticObject;
 
-import static ru.reactiveturtle.reflectthebullet.general.GameData.ONE_METER;
-
 public class TrainTarget extends Sprite implements StaticObject, Physical {
     private Body mBody;
 

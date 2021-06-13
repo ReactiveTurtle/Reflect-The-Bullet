@@ -1,29 +1,10 @@
 package ru.reactiveturtle.reflectthebullet.general;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 public class GameData {
     public static OrthographicCamera CAMERA;
-    public static boolean IS_MUSIC_PLAYING = true;
-    public static float MUSIC_VOLUME = 0.8f;
-    public static boolean IS_SOUND_FX_PLAYING = true;
-    public static float SOUND_FX_VOLUME = 0.8f;
     public static String GAME_FONT = "roboto_medium.fnt";
-
-    public static String CURRENT_LOCATION;
-    public static int CURRENT_LEVEL;
-    public static float ONE_METER = width() / 2f;
-
-
-    public static int width() {
-        return Gdx.graphics.getWidth();
-    }
-
-    public static int height() {
-        return (int) (Gdx.graphics.getWidth() * 16f / 9f);
-    }
 
     public static final String DEFAULT_CURRENT_LEVEL_PARAMS = "desert_open&1";
     public static final String DEFAULT_LEVELS_INFO =

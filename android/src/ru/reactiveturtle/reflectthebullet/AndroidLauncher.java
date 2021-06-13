@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ru.reactiveturtle.reflectthebullet.general.MainGame;
-import ru.reactiveturtle.reflectthebullet.general.screens.main.level.LevelInfo;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
+import ru.reactiveturtle.reflectthebullet.level.LevelData;
 
-public class AndroidLauncher extends AndroidApplication implements AppInterface {
-    private MainGame mMainGame;
+public class AndroidLauncher extends AndroidApplication implements App {
+    private GameContext mGameContext;
     private Repository mRepository;
 
     @Override
@@ -22,8 +22,8 @@ public class AndroidLauncher extends AndroidApplication implements AppInterface 
         super.onCreate(savedInstanceState);
         mRepository = new Repository(this);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        mMainGame = new MainGame(this);
-        initialize(mMainGame, config);
+        mGameContext = new GameContext(this);
+        initialize(mGameContext, config);
     }
 
     @Override
@@ -48,28 +48,28 @@ public class AndroidLauncher extends AndroidApplication implements AppInterface 
     }
 
     @Override
-    public List<LevelInfo> getLevelsInfo(String levelTypeName) {
-        List<LevelInfo> levelsInfoList = new ArrayList<>();
+    public List<LevelData> getLevelsInfo(String levelTypeName) {
+        List<LevelData> levelsInfoList = new ArrayList<>();
         String[] levelsInfo = mRepository.getLevelsInfo().split(";");
         for (String s : levelsInfo) {
             String[] levelsNameSplit = s.split("=");
             if (levelsNameSplit[0].equals(levelTypeName)) {
                 String[] levelsDataSplit = levelsNameSplit[1].split("&");
                 for (String value : levelsDataSplit) {
-                    LevelInfo levelInfo = new LevelInfo();
-                    levelInfo.levelType = levelsNameSplit[0];
+                    LevelData levelData = new LevelData();
+                    levelData.levelType = levelsNameSplit[0];
                     String[] levelFinishSplit = value.split(":");
-                    levelInfo.isFinished = levelFinishSplit[0].equals("1");
+                    levelData.isFinished = levelFinishSplit[0].equals("1");
 
                     String[] levelBestScoreSplit = levelFinishSplit[1].split("-");
-                    levelInfo.bestScore = Integer.parseInt(levelBestScoreSplit[0]);
+                    levelData.bestScore = Integer.parseInt(levelBestScoreSplit[0]);
 
                     String[] levelStarsSplit = levelBestScoreSplit[1].split("#");
                     System.out.println(Arrays.deepToString(levelStarsSplit));
-                    levelInfo.firstStarScore = Integer.parseInt(levelStarsSplit[0]);
-                    levelInfo.secondStarScore = Integer.parseInt(levelStarsSplit[1]);
-                    levelInfo.thirdStarScore = Integer.parseInt(levelStarsSplit[2]);
-                    levelsInfoList.add(levelInfo);
+                    levelData.firstStarScore = Integer.parseInt(levelStarsSplit[0]);
+                    levelData.secondStarScore = Integer.parseInt(levelStarsSplit[1]);
+                    levelData.thirdStarScore = Integer.parseInt(levelStarsSplit[2]);
+                    levelsInfoList.add(levelData);
                 }
                 break;
             }
@@ -105,32 +105,32 @@ public class AndroidLauncher extends AndroidApplication implements AppInterface 
     }
 
     @Override
-    public LevelInfo getLevelInfo(String levelTypeName, int levelIndex) {
+    public LevelData getLevelData(String levelTypeName, int levelIndex) {
         String[] levelsInfo = mRepository.getLevelsInfo().split(";");
         for (String s : levelsInfo) {
             String[] levelsNameSplit = s.split("=");
             if (levelsNameSplit[0].equals(levelTypeName)) {
                 String[] levelsDataSplit = levelsNameSplit[1].split("&");
-                LevelInfo levelInfo = new LevelInfo();
-                levelInfo.levelType = levelsNameSplit[0];
+                LevelData levelData = new LevelData();
+                levelData.levelType = levelsNameSplit[0];
                 String[] levelFinishSplit = levelsDataSplit[levelIndex - 1].split(":");
-                levelInfo.isFinished = levelFinishSplit[0].equals("1");
+                levelData.isFinished = levelFinishSplit[0].equals("1");
 
                 String[] levelBestScoreSplit = levelFinishSplit[1].split("-");
-                levelInfo.bestScore = Integer.parseInt(levelBestScoreSplit[0]);
+                levelData.bestScore = Integer.parseInt(levelBestScoreSplit[0]);
 
                 String[] levelStarsSplit = levelBestScoreSplit[1].split("#");
-                levelInfo.firstStarScore = Integer.parseInt(levelStarsSplit[0]);
-                levelInfo.secondStarScore = Integer.parseInt(levelStarsSplit[1]);
-                levelInfo.thirdStarScore = Integer.parseInt(levelStarsSplit[2]);
-                return levelInfo;
+                levelData.firstStarScore = Integer.parseInt(levelStarsSplit[0]);
+                levelData.secondStarScore = Integer.parseInt(levelStarsSplit[1]);
+                levelData.thirdStarScore = Integer.parseInt(levelStarsSplit[2]);
+                return levelData;
             }
         }
         return null;
     }
 
     @Override
-    public LevelInfo getNextLevel(String levelTypeName, int levelIndex) {
+    public LevelData getNextLevel(String levelTypeName, int levelIndex) {
         String[] locations = mRepository.getLevelsInfo().split(";");
         System.out.println(Arrays.deepToString(locations));
         int index = levelIndex;
@@ -146,20 +146,20 @@ public class AndroidLauncher extends AndroidApplication implements AppInterface 
             }
             System.out.println(index);
             if (name.equals("yes")) {
-                LevelInfo levelInfo = new LevelInfo();
-                levelInfo.levelType = levelsNameSplit[0];
-                levelInfo.levelIndex = index + 1;
+                LevelData levelData = new LevelData();
+                levelData.levelType = levelsNameSplit[0];
+                levelData.levelIndex = index + 1;
                 String[] levelFinishSplit = levelsDataSplit[index].split(":");
-                levelInfo.isFinished = levelFinishSplit[0].equals("1");
+                levelData.isFinished = levelFinishSplit[0].equals("1");
 
                 String[] levelBestScoreSplit = levelFinishSplit[1].split("-");
-                levelInfo.bestScore = Integer.parseInt(levelBestScoreSplit[0]);
+                levelData.bestScore = Integer.parseInt(levelBestScoreSplit[0]);
 
                 String[] levelStarsSplit = levelBestScoreSplit[1].split("#");
-                levelInfo.firstStarScore = Integer.parseInt(levelStarsSplit[0]);
-                levelInfo.secondStarScore = Integer.parseInt(levelStarsSplit[1]);
-                levelInfo.thirdStarScore = Integer.parseInt(levelStarsSplit[2]);
-                return levelInfo;
+                levelData.firstStarScore = Integer.parseInt(levelStarsSplit[0]);
+                levelData.secondStarScore = Integer.parseInt(levelStarsSplit[1]);
+                levelData.thirdStarScore = Integer.parseInt(levelStarsSplit[2]);
+                return levelData;
             }
             if (levelsDataSplit.length == index) {
                 name = "yes";
@@ -181,12 +181,12 @@ public class AndroidLauncher extends AndroidApplication implements AppInterface 
     @Override
     protected void onResume() {
         super.onResume();
-        mMainGame.onResume();
+        mGameContext.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mMainGame.onPause();
+        mGameContext.onPause();
     }
 }

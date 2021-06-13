@@ -9,7 +9,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CloudsManager implements VisualManager{
+import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
+import ru.reactiveturtle.reflectthebullet.base.Drawable;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
+import ru.reactiveturtle.reflectthebullet.base.Renderable;
+
+public class CloudsManager implements Drawable {
     private int minCount, maxCount;
     private float minX, maxX;
     private float minY, maxY;
@@ -19,6 +24,17 @@ public class CloudsManager implements VisualManager{
     private Texture[] clouds;
     private List<Sprite> sprites = new ArrayList<>();
     private List<Float> speeds = new ArrayList<>();
+
+    public CloudsManager createDefault(GameContext gameContext) {
+        DisplayMetrics displayMetrics = gameContext.getDisplayMetrics();
+        return new CloudsManager(displayMetrics.widthPixels(), displayMetrics.widthPixels() / 8f,
+                3, 8,
+                0, displayMetrics.widthPixels(),
+                Gdx.graphics.getHeight() * 2 / 3f, Gdx.graphics.getHeight() - displayMetrics.widthPixels() / 5f,
+                0.75f, 1.25f, displayMetrics.widthPixels() / 128f, displayMetrics.widthPixels() / 16f,
+                "clouds/cloud1.png", "clouds/cloud2.png", "clouds/cloud3.png",
+                "clouds/cloud4.png", "clouds/cloud5.png", "clouds/cloud6.png", "clouds/cloud7.png");
+    }
 
     public CloudsManager(float screenHeightPart, float cloudHeight,
                          int minCount, int maxCount,
@@ -64,7 +80,8 @@ public class CloudsManager implements VisualManager{
     }
 
     @Override
-    public void draw(SpriteBatch spriteBatch, float deltaTime) {
+    public void draw(SpriteBatch spriteBatch) {
+        float deltaTime = Gdx.graphics.getDeltaTime();
         for (int i = 0; i < sprites.size(); i++) {
             Sprite sprite = sprites.get(i);
             sprites.get(i).draw(spriteBatch);
@@ -108,7 +125,6 @@ public class CloudsManager implements VisualManager{
         }
     }
 
-    @Override
     public void dispose() {
         for (int i = 0; i < sprites.size(); i++) {
             sprites.get(i).getTexture().dispose();
@@ -130,4 +146,5 @@ public class CloudsManager implements VisualManager{
         texture.dispose();
         return new Texture(pixmap);
     }
+
 }

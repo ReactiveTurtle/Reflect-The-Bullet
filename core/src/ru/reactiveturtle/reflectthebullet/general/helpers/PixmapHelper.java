@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 
-import static ru.reactiveturtle.reflectthebullet.general.GameData.width;
-
 public class PixmapHelper {
     public static Pixmap rotatePixmapTo90(Pixmap srcPix) {
         final int width = srcPix.getWidth();

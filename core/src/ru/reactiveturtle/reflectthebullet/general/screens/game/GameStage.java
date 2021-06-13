@@ -2,43 +2,36 @@ package ru.reactiveturtle.reflectthebullet.general.screens.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 import ru.reactiveturtle.reflectthebullet.Button;
+import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
+import ru.reactiveturtle.reflectthebullet.base.Stage;
 import ru.reactiveturtle.reflectthebullet.general.helpers.PixmapHelper;
-
-import static ru.reactiveturtle.reflectthebullet.general.GameData.GAME_FONT;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.height;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.width;
 
 public class GameStage extends Stage {
     private Button shootButton;
     private Image bulletsCountImage;
     private ActionListener actionListener;
 
-    public GameStage() {
+    public GameStage(GameContext gameContext) {
+        super(gameContext);
+
+        DisplayMetrics displayMetrics = gameContext.getDisplayMetrics();
+
         shootButton = new Button("");
         shootButton.setUserObject("shoot");
         shootButton.getColor().a = 0.8f;
-        shootButton.setSize(width() / 6f, width() / 6f);
-        shootButton.setX(width() - shootButton.getWidth() - width() / 12f);
-        shootButton.setY(width() / 12f);
+        shootButton.setSize(displayMetrics.widthPixels() / 6f, displayMetrics.widthPixels() / 6f);
+        shootButton.setX(displayMetrics.widthPixels() - shootButton.getWidth() - displayMetrics.widthPixels() / 12f);
+        shootButton.setY(displayMetrics.widthPixels() / 12f);
         shootButton.setTexture("shoot_button_up.png", Button.TouchState.UP);
         shootButton.setTexture("shoot_button_down.png", Button.TouchState.DOWN);
         shootButton.setDrawable(shootButton.getDrawable(Button.TouchState.DOWN), Button.TouchState.OVER);
@@ -47,7 +40,7 @@ public class GameStage extends Stage {
         shootButton.addListener(mClickListener);
         bulletsCountImage = new Image();
         bulletsCountImage.getColor().a = 0.8f;
-        bulletsCountImage.setHeight(width() / 24f);
+        bulletsCountImage.setHeight(displayMetrics.widthPixels() / 24f);
         addActor(bulletsCountImage);
     }
 
@@ -92,6 +85,8 @@ public class GameStage extends Stage {
     }
 
     public void showBulletsCount(int bulletsCount) {
+        DisplayMetrics displayMetrics = getGameContext().getDisplayMetrics();
+
         Texture texture = new Texture(Gdx.files.internal("cartridge.png"));
         texture.getTextureData().prepare();
         Pixmap src = PixmapHelper.rotatePixmapTo90(texture.getTextureData().consumePixmap());
@@ -102,7 +97,7 @@ public class GameStage extends Stage {
         }
         bulletsCountImage.setDrawable(new TextureRegionDrawable(new TextureRegion(new Texture(pixmap))));
         bulletsCountImage.setWidth(bulletsCountImage.getHeight() * pixmap.getWidth() / pixmap.getHeight());
-        bulletsCountImage.setPosition(width() / 12f + width() / 48f, width() / 12f + width() / 48f);
+        bulletsCountImage.setPosition(displayMetrics.widthPixels() / 12f + displayMetrics.widthPixels() / 48f, displayMetrics.widthPixels() / 12f + displayMetrics.widthPixels() / 48f);
     }
 
     public interface ActionListener {

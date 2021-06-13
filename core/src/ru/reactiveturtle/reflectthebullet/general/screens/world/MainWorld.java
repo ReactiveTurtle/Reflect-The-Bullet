@@ -1,7 +1,6 @@
 package ru.reactiveturtle.reflectthebullet.general.screens.world;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -17,17 +16,11 @@ import java.util.List;
 import java.util.Random;
 
 import ru.reactiveturtle.reflectthebullet.general.screens.game.GameScreen;
-import ru.reactiveturtle.reflectthebullet.general.screens.world.visualmanagers.VisualManager;
+import ru.reactiveturtle.reflectthebullet.base.Renderable;
 import ru.reactiveturtle.reflectthebullet.objects.Bullet;
 import ru.reactiveturtle.reflectthebullet.Helper;
 import ru.reactiveturtle.reflectthebullet.Revolver;
 import ru.reactiveturtle.reflectthebullet.objects.StaticObject;
-
-import static ru.reactiveturtle.reflectthebullet.general.GameData.IS_SOUND_FX_PLAYING;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.ONE_METER;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.SOUND_FX_VOLUME;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.height;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.width;
 
 public class MainWorld implements GameWorld, Keeper {
     private GameScreen mGameScreen;
@@ -35,7 +28,7 @@ public class MainWorld implements GameWorld, Keeper {
     private String mLoadedLocation = "unknown";
 
     private List<Sprite> mBackList = new ArrayList<Sprite>();
-    private List<VisualManager> mVisualManagers = new ArrayList<>();
+    private List<Renderable> mRenderables = new ArrayList<>();
 
     private Revolver mRevolver;
     private Sprite mAim;
@@ -44,14 +37,6 @@ public class MainWorld implements GameWorld, Keeper {
     private int mScore = 0;
     private int mBestScore = 0;
     private List<StaticObject> mStaticObjects = new ArrayList<StaticObject>();
-
-    private Sound shotSound = Gdx.audio.newSound(Gdx.files.internal("revolver_shot.ogg"));
-    private Sound bulletToTargetSound = Gdx.audio.newSound(Gdx.files.internal("bullet_to_target.ogg"));
-    private Sound rikoshetSound1 = Gdx.audio.newSound(Gdx.files.internal("rikoshet1.ogg"));
-    private Sound rikoshetSound2 = Gdx.audio.newSound(Gdx.files.internal("rikoshet2.ogg"));
-    private Sound rikoshetSound3 = Gdx.audio.newSound(Gdx.files.internal("rikoshet3.ogg"));
-    private Sound rikoshetSound4 = Gdx.audio.newSound(Gdx.files.internal("rikoshet4.ogg"));
-    private Sound hitSound = Gdx.audio.newSound(Gdx.files.internal("hit.ogg"));
 
     public MainWorld(GameScreen gameScreen) {
         mGameScreen = gameScreen;
@@ -107,8 +92,8 @@ public class MainWorld implements GameWorld, Keeper {
         for (int i = 0; i < mBackList.size(); i++) {
             mBackList.get(i).draw(spriteBatch);
         }
-        for (int i = 0; i < mVisualManagers.size(); i++) {
-            mVisualManagers.get(i).draw(spriteBatch, Gdx.graphics.getDeltaTime());
+        for (int i = 0; i < mRenderables.size(); i++) {
+            mRenderables.get(i).draw(spriteBatch, Gdx.graphics.getDeltaTime());
         }
     }
 
@@ -178,10 +163,10 @@ public class MainWorld implements GameWorld, Keeper {
             mBackList.get(i).getTexture().dispose();
         }
         mBackList.clear();
-        for (int i = 0; i < mVisualManagers.size(); i++) {
-            mVisualManagers.get(i).dispose();
+        for (int i = 0; i < mRenderables.size(); i++) {
+            mRenderables.get(i).dispose();
         }
-        mVisualManagers.clear();
+        mRenderables.clear();
         for (int i = 0; i < mStaticObjects.size(); i++) {
             mStaticObjects.get(i).getPhysical().disposeObject();
         }
@@ -199,8 +184,8 @@ public class MainWorld implements GameWorld, Keeper {
     }
 
     @Override
-    public void addVisualManager(VisualManager visualManager) {
-        mVisualManagers.add(visualManager);
+    public void addVisualManager(Renderable renderable) {
+        mRenderables.add(renderable);
     }
 
     @Override

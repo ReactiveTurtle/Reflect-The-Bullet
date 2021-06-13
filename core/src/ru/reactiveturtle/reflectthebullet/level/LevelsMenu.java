@@ -1,48 +1,55 @@
-package ru.reactiveturtle.reflectthebullet.general.screens.main.level;
+package ru.reactiveturtle.reflectthebullet.level;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.reactiveturtle.reflectthebullet.general.GameData.width;
+import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
+import ru.reactiveturtle.reflectthebullet.base.Stage;
+
 
 public class LevelsMenu extends Stage {
     private List<LevelBox> mLevelBoxes = new ArrayList<>();
     private ActionListener actionListener;
 
+    public LevelsMenu(GameContext gameContext) {
+        super(gameContext);
+    }
+
     @Override
     public boolean keyDown(int keyCode) {
         if (keyCode == Input.Keys.ESCAPE || keyCode == Input.Keys.BACK) {
             if (actionListener != null) {
-                actionListener.onAction("escape");
+                actionListener.onAction(Action.ESCAPE);
             }
         }
         return super.keyDown(keyCode);
     }
 
-    public void showLevels(String levelType, List<LevelInfo> levelInfoList) {
+    public void showLevels(LevelType levelType, List<LevelData> levelDataList) {
         clear();
+
+        DisplayMetrics displayMetrics = getGameContext().getDisplayMetrics();
+
         for (int i = 0; i < mLevelBoxes.size(); i++) {
             mLevelBoxes.get(i).dispose();
         }
         mLevelBoxes.clear();
-        int levelBoxSize = (int) (width() / 4f);
+        int levelBoxSize = (int) (displayMetrics.widthPixels() / 4f);
         int space = (int) (levelBoxSize / 4f);
-        System.out.println(levelInfoList.size());
-        LevelInfo lastLevelInfo = new LevelInfo();
-        lastLevelInfo.isFinished = true;
+        LevelData lastLevelData = new LevelData();
         Color color = getLevelTypeColor(levelType);
-        for (int i = 0; i < levelInfoList.size() / 3f; i++) {
-            for (int j = 0; j < (levelInfoList.size() / 3 == i ? levelInfoList.size() % 3 : 3); j++) {
-                LevelInfo levelInfo = levelInfoList.get(i * 3 + j);
+        for (int i = 0; i < levelDataList.size() / 3f; i++) {
+            for (int j = 0; j < (levelDataList.size() / 3 == i ? levelDataList.size() % 3 : 3); j++) {
+                LevelData levelData = levelDataList.get(i * 3 + j);
                 mLevelBoxes.add(new LevelBox(this, levelType, color,
-                        levelInfo, lastLevelInfo, i, j, levelBoxSize, space, mClickListener));
-                lastLevelInfo = levelInfo;
+                        levelData, lastLevelData, i, j, levelBoxSize, space, mClickListener));
+                lastLevelData = levelData;
             }
         }
     }
@@ -75,7 +82,7 @@ public class LevelsMenu extends Stage {
             super.clicked(event, x, y);
             mLevelBoxes.get(Integer.parseInt(((String) event.getListenerActor().getUserObject()).split("&")[1]) - 1).release();
             if (actionListener != null) {
-                actionListener.onAction((String) event.getListenerActor().getUserObject());
+                actionListener.onAction((Action) event.getListenerActor().getUserObject());
             }
         }
     };
@@ -85,17 +92,24 @@ public class LevelsMenu extends Stage {
     }
 
     public interface ActionListener {
-        void onAction(String id);
+        void onAction(Action action);
+
+        void onLevelClick(String levelFile);
     }
 
-    private Color getLevelTypeColor(String levelType) {
+    private Color getLevelTypeColor(LevelType levelType) {
         System.out.println(levelType);
         switch (levelType) {
-            case "desert_open":
+            case DESERT:
                 return Color.GOLDENROD;
-            case "celt_open":
+            case CELT:
                 return Color.OLIVE;
         }
         return Color.GRAY;
+    }
+
+
+    public enum Action {
+        ESCAPE
     }
 }

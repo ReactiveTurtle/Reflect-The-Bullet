@@ -15,26 +15,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-import ru.reactiveturtle.reflectthebullet.AppInterface;
+import ru.reactiveturtle.reflectthebullet.App;
 import ru.reactiveturtle.reflectthebullet.Helper;
+import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
+import ru.reactiveturtle.reflectthebullet.base.LevelRepository;
+import ru.reactiveturtle.reflectthebullet.base.Stage;
 import ru.reactiveturtle.reflectthebullet.general.GameData;
-import ru.reactiveturtle.reflectthebullet.general.screens.Screen;
-import ru.reactiveturtle.reflectthebullet.general.screens.main.level.LevelInfo;
+import ru.reactiveturtle.reflectthebullet.level.LevelData;
 import ru.reactiveturtle.reflectthebullet.general.screens.main.SettingsMenu;
 import ru.reactiveturtle.reflectthebullet.general.screens.world.GameWorld;
 import ru.reactiveturtle.reflectthebullet.general.screens.world.MainWorld;
+import ru.reactiveturtle.reflectthebullet.main.settings.Settings;
 
-import static ru.reactiveturtle.reflectthebullet.general.GameData.CURRENT_LEVEL;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.CURRENT_LOCATION;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.IS_MUSIC_PLAYING;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.IS_SOUND_FX_PLAYING;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.MUSIC_VOLUME;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.SOUND_FX_VOLUME;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.width;
-
-public class GameScreen implements Screen {
-    private AppInterface mAppInterface;
-
+public class GameScreen extends Stage {
     private Image mPauseShadow;
     private PauseMenu mPauseMenu;
     private SettingsMenu mSettingsMenu;
@@ -59,10 +53,13 @@ public class GameScreen implements Screen {
 
     private ActionListener mActionListener;
 
-    public GameScreen(AppInterface appInterface) {
-        mAppInterface = appInterface;
+    public GameScreen(final GameContext gameContext) {
+        super(gameContext);
+
+        DisplayMetrics displayMetrics = gameContext.getDisplayMetrics();
+
         mPauseShadow = new Image();
-        mPauseShadow.setSize(width(), Gdx.graphics.getHeight());
+        mPauseShadow.setSize(displayMetrics.widthPixels(), Gdx.graphics.getHeight());
         Pixmap pixmap = new Pixmap(100, 100, Pixmap.Format.RGBA4444);
         pixmap.setColor(0, 0, 0, 0.8f);
         pixmap.fillRectangle(0, 0, 100, 100);
@@ -81,7 +78,7 @@ public class GameScreen implements Screen {
                         break;
                     case "pause_settings":
                         mPauseSelectedStage = 1;
-                        mSettingsMenu.updateSettings(IS_MUSIC_PLAYING, MUSIC_VOLUME, IS_SOUND_FX_PLAYING, SOUND_FX_VOLUME);
+                        mSettingsMenu.updateSettings(gameContext.getSettings());
                         Gdx.input.setInputProcessor(mSettingsMenu);
                         break;
                     case "pause_exit":
@@ -92,29 +89,21 @@ public class GameScreen implements Screen {
                 }
             }
         });
-        mSettingsMenu = new SettingsMenu(IS_MUSIC_PLAYING, MUSIC_VOLUME, IS_SOUND_FX_PLAYING, SOUND_FX_VOLUME);
+        mSettingsMenu = new SettingsMenu(gameContext);
         mSettingsMenu.setActionListener(new SettingsMenu.ActionListener() {
             @Override
-            public void onStateChanged(boolean isMusicPlaying, float musicVolume, boolean isSoundFxPlaying, float soundFxVolume) {
-                IS_MUSIC_PLAYING = isMusicPlaying;
-                MUSIC_VOLUME = musicVolume;
-                if (isPause) {
-                    mLevelMusic.setVolume(MUSIC_VOLUME * 0.3f);
-                } else {
-                    mLevelMusic.setVolume(MUSIC_VOLUME);
-                }
-                if (!IS_MUSIC_PLAYING && !isMusicPlaying && mLevelMusic.isPlaying()) {
+            public void onStateChanged(Settings settings) {
+                mLevelMusic.setVolume(settings.getMusicVolume());
+                if (!settings.isMusicPlaying() && mLevelMusic.isPlaying()) {
                     mLevelMusic.stop();
-                } else if (IS_MUSIC_PLAYING && isMusicPlaying && !mLevelMusic.isPlaying()) {
+                } else if (settings.isMusicPlaying() && !mLevelMusic.isPlaying()) {
                     mLevelMusic.play();
                 }
-                IS_SOUND_FX_PLAYING = isSoundFxPlaying;
-                SOUND_FX_VOLUME = soundFxVolume;
             }
 
             @Override
-            public void applySettings() {
-                mAppInterface.setSettings(IS_MUSIC_PLAYING, MUSIC_VOLUME, IS_SOUND_FX_PLAYING, SOUND_FX_VOLUME);
+            public void applySettings(Settings settings) {
+                getGameContext().updateSettings(settings);
             }
 
             @Override
@@ -124,7 +113,7 @@ public class GameScreen implements Screen {
             }
         });
 
-        mGameStage = new GameStage();
+        mGameStage = new GameStage(gameContext);
         mScoreStage = new ScoreStage();
         mGameStage.setActionListener(new GameStage.ActionListener() {
             @Override
@@ -136,7 +125,7 @@ public class GameScreen implements Screen {
                 } else if (id.equals("escape")) {
                     pause();
                     Gdx.input.setInputProcessor(mPauseMenu);
-                    mLevelMusic.setVolume(MUSIC_VOLUME * 0.3f);
+                    mLevelMusic.setVolume(gameContext.getSettings().getMusicVolume() * 0.3f);
                 }
             }
 
@@ -197,7 +186,7 @@ public class GameScreen implements Screen {
                 isScreenDown = false;
             }
         });
-        mEndLevelMenu = new EndLevelMenu();
+        mEndLevelMenu = new EndLevelMenu(gameContext);
         mEndLevelMenu.setActionListener(new EndLevelMenu.ActionListener() {
             @Override
             public void onAction(String id) {
@@ -216,10 +205,10 @@ public class GameScreen implements Screen {
                         start();
                         break;
                     case "next":
-                        LevelInfo levelInfo = mAppInterface.getNextLevel(CURRENT_LOCATION, CURRENT_LEVEL);
-                        mAppInterface.setCurrentLevelParams(levelInfo.levelType, levelInfo.levelIndex);
-                        CURRENT_LOCATION = levelInfo.levelType;
-                        CURRENT_LEVEL = levelInfo.levelIndex;
+                        LevelRepository levelRepository = gameContext.getLevelRepository();
+                        String lastLevelFile = levelRepository.getLastLevel().getLevelFile();
+                        LevelData levelData = levelRepository.getNextLevel(lastLevelFile);
+                        levelRepository.setLastLevel(levelData.getLevelFile());
                         loadCurrentLevel();
                         start();
                         break;
@@ -238,7 +227,7 @@ public class GameScreen implements Screen {
     }
 
     public void startMusic() {
-        if (IS_MUSIC_PLAYING) {
+        if (getGameContext().getSettings().isMusicPlaying()) {
             mLevelMusic.play();
         }
     }
@@ -256,13 +245,13 @@ public class GameScreen implements Screen {
     public void start() {
         isPause = false;
         Gdx.input.setInputProcessor(mGameStage);
-        mLevelMusic.setVolume(MUSIC_VOLUME);
+        mLevelMusic.setVolume(getGameContext().getSettings().getMusicVolume());
     }
 
     public void pause() {
         isPause = true;
         Gdx.input.setInputProcessor(mPauseMenu);
-        mLevelMusic.setVolume(MUSIC_VOLUME * 0.3f);
+        mLevelMusic.setVolume(getGameContext().getSettings().getMusicVolume() * 0.3f);
     }
 
     public boolean isPause() {
@@ -321,20 +310,20 @@ public class GameScreen implements Screen {
                 if (mMainWorld.getBullet() == null && mMainWorld.getRevolver().getBulletsCount() == 0) {
                     mEndLevelMenu.draw();
                     if (Gdx.input.getInputProcessor().hashCode() != mEndLevelMenu.hashCode()) {
-                        LevelInfo levelInfo = mAppInterface.getLevelInfo(CURRENT_LOCATION, CURRENT_LEVEL);
-                        LevelInfo nextLevel = mAppInterface.getNextLevel(CURRENT_LOCATION, CURRENT_LEVEL);
-                        if ((levelInfo.isFinished || mMainWorld.getBestScore() >= levelInfo.firstStarScore) && nextLevel != null) {
+                        LevelData levelData = mAppInterface.getLevelData(CURRENT_LOCATION, CURRENT_LEVEL);
+                        LevelData nextLevel = mAppInterface.getNextLevel(CURRENT_LOCATION, CURRENT_LEVEL);
+                        if ((levelData.isFinished || mMainWorld.getBestScore() >= levelData.firstStarScore) && nextLevel != null) {
                             mEndLevelMenu.enableNextLevelButton();
                         } else {
                             mEndLevelMenu.disableNextLevelButton();
                         }
                         mAppInterface.setLevelInfo(CURRENT_LOCATION, CURRENT_LEVEL,
-                                levelInfo.bestScore < mMainWorld.getBestScore() ? mMainWorld.getBestScore() : levelInfo.bestScore,
-                                levelInfo.isFinished || mMainWorld.getBestScore() >= mAppInterface.getLevelInfo(CURRENT_LOCATION, CURRENT_LEVEL).firstStarScore);
-                        mEndLevelMenu.showScore(mAppInterface.getLevelInfo(CURRENT_LOCATION, CURRENT_LEVEL).bestScore,
-                                mMainWorld.getBestScore(), mMainWorld.getBestScore() < levelInfo.firstStarScore ? 0 :
-                                        mMainWorld.getBestScore() < levelInfo.secondStarScore ? 1 :
-                                                mMainWorld.getBestScore() < levelInfo.thirdStarScore ? 2 : 3);
+                                levelData.bestScore < mMainWorld.getBestScore() ? mMainWorld.getBestScore() : levelData.bestScore,
+                                levelData.isFinished || mMainWorld.getBestScore() >= mAppInterface.getLevelData(CURRENT_LOCATION, CURRENT_LEVEL).firstStarScore);
+                        mEndLevelMenu.showScore(mAppInterface.getLevelData(CURRENT_LOCATION, CURRENT_LEVEL).bestScore,
+                                mMainWorld.getBestScore(), mMainWorld.getBestScore() < levelData.firstStarScore ? 0 :
+                                        mMainWorld.getBestScore() < levelData.secondStarScore ? 1 :
+                                                mMainWorld.getBestScore() < levelData.thirdStarScore ? 2 : 3);
                         pause();
                         Gdx.input.setInputProcessor(mEndLevelMenu);
                     }

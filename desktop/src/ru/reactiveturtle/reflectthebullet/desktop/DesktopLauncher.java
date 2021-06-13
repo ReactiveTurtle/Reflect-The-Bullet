@@ -12,20 +12,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ru.reactiveturtle.reflectthebullet.AppInterface;
 import ru.reactiveturtle.reflectthebullet.general.GameData;
-import ru.reactiveturtle.reflectthebullet.general.MainGame;
-import ru.reactiveturtle.reflectthebullet.general.screens.main.level.LevelInfo;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
+import ru.reactiveturtle.reflectthebullet.level.LevelData;
 
 public class DesktopLauncher {
     public static void main(String[] arg) {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.width = 540;
         config.height = 960;
-        new LwjglApplication(new MainGame(new App()), config);
+        new LwjglApplication(new GameContext(new App()), config);
     }
 
-    public static class App implements AppInterface {
+    public static class App implements ru.reactiveturtle.reflectthebullet.App {
         private static final String LEVELS_DATA_DIR = "C:/Documents/Reflect The Bullet";
 
         App() {
@@ -100,9 +99,9 @@ public class DesktopLauncher {
         }
 
         @Override
-        public List<LevelInfo> getLevelsInfo(String levelTypeName) {
+        public List<LevelData> getLevelsInfo(String levelTypeName) {
             init();
-            List<LevelInfo> levelsInfoList = new ArrayList<>();
+            List<LevelData> levelsInfoList = new ArrayList<>();
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(new File(LEVELS_DATA_DIR + "/levelsData")));
                 reader.readLine();
@@ -112,20 +111,20 @@ public class DesktopLauncher {
                     if (levelsNameSplit[0].equals(levelTypeName)) {
                         String[] levelsDataSplit = levelsNameSplit[1].split("&");
                         for (int j = 0; j < levelsDataSplit.length; j++) {
-                            LevelInfo levelInfo = new LevelInfo();
-                            levelInfo.levelType = levelsNameSplit[0];
+                            LevelData levelData = new LevelData();
+                            levelData.levelType = levelsNameSplit[0];
                             String[] levelFinishSplit = levelsDataSplit[j].split(":");
-                            levelInfo.isFinished = levelFinishSplit[0].equals("1");
+                            levelData.isFinished = levelFinishSplit[0].equals("1");
 
                             String[] levelBestScoreSplit = levelFinishSplit[1].split("-");
-                            levelInfo.bestScore = Integer.parseInt(levelBestScoreSplit[0]);
+                            levelData.bestScore = Integer.parseInt(levelBestScoreSplit[0]);
 
                             String[] levelStarsSplit = levelBestScoreSplit[1].split("#");
                             System.out.println(Arrays.deepToString(levelStarsSplit));
-                            levelInfo.firstStarScore = Integer.parseInt(levelStarsSplit[0]);
-                            levelInfo.secondStarScore = Integer.parseInt(levelStarsSplit[1]);
-                            levelInfo.thirdStarScore = Integer.parseInt(levelStarsSplit[2]);
-                            levelsInfoList.add(levelInfo);
+                            levelData.firstStarScore = Integer.parseInt(levelStarsSplit[0]);
+                            levelData.secondStarScore = Integer.parseInt(levelStarsSplit[1]);
+                            levelData.thirdStarScore = Integer.parseInt(levelStarsSplit[2]);
+                            levelsInfoList.add(levelData);
                         }
                         reader.close();
                         break;
@@ -183,7 +182,7 @@ public class DesktopLauncher {
         }
 
         @Override
-        public LevelInfo getLevelInfo(String levelTypeName, int levelIndex) {
+        public LevelData getLevelData(String levelTypeName, int levelIndex) {
             init();
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(new File(LEVELS_DATA_DIR + "/levelsData")));
@@ -193,20 +192,20 @@ public class DesktopLauncher {
                     String[] levelsNameSplit = locations[i].split("=");
                     if (levelsNameSplit[0].equals(levelTypeName)) {
                         String[] levelsDataSplit = levelsNameSplit[1].split("&");
-                        LevelInfo levelInfo = new LevelInfo();
-                        levelInfo.levelType = levelsNameSplit[0];
+                        LevelData levelData = new LevelData();
+                        levelData.levelType = levelsNameSplit[0];
                         String[] levelFinishSplit = levelsDataSplit[levelIndex - 1].split(":");
-                        levelInfo.isFinished = levelFinishSplit[0].equals("1");
+                        levelData.isFinished = levelFinishSplit[0].equals("1");
 
                         String[] levelBestScoreSplit = levelFinishSplit[1].split("-");
-                        levelInfo.bestScore = Integer.parseInt(levelBestScoreSplit[0]);
+                        levelData.bestScore = Integer.parseInt(levelBestScoreSplit[0]);
 
                         String[] levelStarsSplit = levelBestScoreSplit[1].split("#");
-                        levelInfo.firstStarScore = Integer.parseInt(levelStarsSplit[0]);
-                        levelInfo.secondStarScore = Integer.parseInt(levelStarsSplit[1]);
-                        levelInfo.thirdStarScore = Integer.parseInt(levelStarsSplit[2]);
+                        levelData.firstStarScore = Integer.parseInt(levelStarsSplit[0]);
+                        levelData.secondStarScore = Integer.parseInt(levelStarsSplit[1]);
+                        levelData.thirdStarScore = Integer.parseInt(levelStarsSplit[2]);
                         reader.close();
-                        return levelInfo;
+                        return levelData;
                     }
                 }
             } catch (IOException e) {
@@ -216,7 +215,7 @@ public class DesktopLauncher {
         }
 
         @Override
-        public LevelInfo getNextLevel(String levelTypeName, int levelIndex) {
+        public LevelData getNextLevel(String levelTypeName, int levelIndex) {
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(new File(LEVELS_DATA_DIR + "/levelsData")));
                 reader.readLine();
@@ -233,21 +232,21 @@ public class DesktopLauncher {
                                 levelsDataSplit = levelsNameSplit[1].split("&");
                             }
                         }
-                        LevelInfo levelInfo = new LevelInfo();
-                        levelInfo.levelType = levelsNameSplit[0];
-                        levelInfo.levelIndex = index + 1;
+                        LevelData levelData = new LevelData();
+                        levelData.levelType = levelsNameSplit[0];
+                        levelData.levelIndex = index + 1;
                         String[] levelFinishSplit = levelsDataSplit[index].split(":");
-                        levelInfo.isFinished = levelFinishSplit[0].equals("1");
+                        levelData.isFinished = levelFinishSplit[0].equals("1");
 
                         String[] levelBestScoreSplit = levelFinishSplit[1].split("-");
-                        levelInfo.bestScore = Integer.parseInt(levelBestScoreSplit[0]);
+                        levelData.bestScore = Integer.parseInt(levelBestScoreSplit[0]);
 
                         String[] levelStarsSplit = levelBestScoreSplit[1].split("#");
-                        levelInfo.firstStarScore = Integer.parseInt(levelStarsSplit[0]);
-                        levelInfo.secondStarScore = Integer.parseInt(levelStarsSplit[1]);
-                        levelInfo.thirdStarScore = Integer.parseInt(levelStarsSplit[2]);
+                        levelData.firstStarScore = Integer.parseInt(levelStarsSplit[0]);
+                        levelData.secondStarScore = Integer.parseInt(levelStarsSplit[1]);
+                        levelData.thirdStarScore = Integer.parseInt(levelStarsSplit[2]);
                         reader.close();
-                        return levelInfo;
+                        return levelData;
                     }
                 }
             } catch (IOException e) {

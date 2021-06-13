@@ -1,41 +1,51 @@
 package ru.reactiveturtle.reflectthebullet.general.screens.main;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import ru.reactiveturtle.reflectthebullet.Button;
-
-import static ru.reactiveturtle.reflectthebullet.general.GameData.width;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
+import ru.reactiveturtle.reflectthebullet.base.Stage;
 
 public class MainMenu extends Stage {
     private ActionListener actionListener;
     private static final Color BUTTON_UP_COLOR = Color.valueOf("#1faa00");
     private static final Color BUTTON_DOWN_COLOR = Color.FIREBRICK;
-    private static final int BUTTON_WIDTH = width() / 2;
-    private static final int BUTTON_HEIGHT = width() / 8;
+    private final int BUTTON_WIDTH;
+    private final int BUTTON_HEIGHT;
 
-    public MainMenu() {
-        createButton("Продолжить", "continue",
-                Gdx.graphics.getHeight() / 2f + BUTTON_HEIGHT + BUTTON_HEIGHT * 3 / 16f);
+    public MainMenu(GameContext gameContext) {
+        super(gameContext);
+        BUTTON_WIDTH =  gameContext.getDisplayMetrics().widthPixels() / 2;
+        BUTTON_HEIGHT = gameContext.getDisplayMetrics().heightPixels() / 8;
 
-        createButton("Уровни", "select_level",
-                Gdx.graphics.getHeight() / 2f + BUTTON_HEIGHT / 16f);
+        createButton(
+                "Продолжить",
+                Action.CONTINUE,
+                gameContext.getDisplayMetrics().heightPixels() / 2f + BUTTON_HEIGHT + BUTTON_HEIGHT * 3 / 16f);
 
-        createButton("Настройки", "settings",
-                Gdx.graphics.getHeight() / 2f - BUTTON_HEIGHT - BUTTON_HEIGHT / 16f);
+        createButton(
+                "Уровни",
+                Action.SELECT_LEVEL,
+                gameContext.getDisplayMetrics().heightPixels() / 2f + BUTTON_HEIGHT / 16f);
 
-        createButton("Выйти из игры", "exit_from_game",
-                Gdx.graphics.getHeight() / 2f - BUTTON_HEIGHT * 2f - BUTTON_HEIGHT * 3 / 16f);
+        createButton(
+                "Настройки",
+                Action.SETTINGS,
+                gameContext.getDisplayMetrics().heightPixels() / 2f - BUTTON_HEIGHT - BUTTON_HEIGHT / 16f);
+
+        createButton(
+                "Выйти из игры",
+                Action.EXIT,
+                gameContext.getDisplayMetrics().heightPixels() / 2f - BUTTON_HEIGHT * 2f - BUTTON_HEIGHT * 3 / 16f);
     }
 
-    private void createButton(String text, String id, float y) {
+    private void createButton(String text, Action action, float y) {
         Button button = new Button(text);
-        button.setUserObject(id);
+        button.setUserObject(action);
         button.setSize(BUTTON_WIDTH, BUTTON_HEIGHT);
-        button.setX(width() / 2f - button.getWidth() / 2f);
+        button.setX(getGameContext().getDisplayMetrics().widthPixels() / 2f - button.getWidth() / 2f);
         button.setY(y);
         button.setColor(BUTTON_UP_COLOR, Button.TouchState.UP);
         button.setColor(BUTTON_DOWN_COLOR, Button.TouchState.DOWN);
@@ -48,16 +58,23 @@ public class MainMenu extends Stage {
         public void clicked(InputEvent event, float x, float y) {
             super.clicked(event, x, y);
             if (actionListener != null) {
-                actionListener.onAction((String) event.getListenerActor().getUserObject());
+                actionListener.onAction((Action) event.getListenerActor().getUserObject());
             }
         }
     };
 
-    void setActionListener(ActionListener actionListener) {
+    public void setActionListener(ActionListener actionListener) {
         this.actionListener = actionListener;
     }
 
     public interface ActionListener {
-        void onAction(String id);
+        void onAction(Action action);
+    }
+
+    public enum Action {
+        CONTINUE,
+        SELECT_LEVEL,
+        SETTINGS,
+        EXIT
     }
 }

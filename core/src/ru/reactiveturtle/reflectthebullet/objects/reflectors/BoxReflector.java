@@ -8,22 +8,22 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import ru.reactiveturtle.reflectthebullet.Helper;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.objects.Physical;
 import ru.reactiveturtle.reflectthebullet.objects.StaticObject;
 
-import static ru.reactiveturtle.reflectthebullet.general.GameData.ONE_METER;
 
 public class BoxReflector extends Sprite implements StaticObject, Physical {
     private Body mBody;
     private float mCellWidth, mCellHeight;
+    private final float oneMeter;
 
-    public BoxReflector(Pixmap pixmap, float cellWidth, float cellHeight) {
+    public BoxReflector(GameContext gameContext, Pixmap pixmap, float cellWidth, float cellHeight) {
         super(new Texture(pixmap));
+        oneMeter = gameContext.getDisplayMetrics().getOneMeterPixels();
         mCellWidth = cellWidth;
         mCellHeight = cellHeight;
         setOrigin(0, 0);
@@ -31,7 +31,6 @@ public class BoxReflector extends Sprite implements StaticObject, Physical {
 
     @Override
     public void createBody(World world) {
-        float oneMeter = ONE_METER;
         BodyDef def = new BodyDef();
         def.type = BodyDef.BodyType.StaticBody;
         def.position.set(getX() / oneMeter, getY() / oneMeter);

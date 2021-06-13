@@ -14,19 +14,18 @@ import ru.reactiveturtle.reflectthebullet.Helper;
 import ru.reactiveturtle.reflectthebullet.objects.Physical;
 import ru.reactiveturtle.reflectthebullet.objects.StaticObject;
 
-import static ru.reactiveturtle.reflectthebullet.general.GameData.ONE_METER;
-
 public class RectangleReflector extends Sprite implements StaticObject, Physical {
     private Body mBody;
+    private final float oneMeter;
 
-    public RectangleReflector(Texture texture) {
+    public RectangleReflector(Texture texture, float oneMeter) {
         super(texture);
+        this.oneMeter = oneMeter;
         setOrigin(0, 0);
     }
 
     @Override
     public void createBody(World world) {
-        float oneMeter = ONE_METER;
         BodyDef def = new BodyDef();
         def.type = BodyDef.BodyType.StaticBody;
         def.angle = (float) Math.toRadians(getRotation());
