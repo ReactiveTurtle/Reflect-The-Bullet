@@ -15,7 +15,7 @@ import java.util.List;
 
 import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
 import ru.reactiveturtle.reflectthebullet.base.Stage;
-import ru.reactiveturtle.reflectthebullet.general.helpers.PixmapHelper;
+import ru.reactiveturtle.reflectthebullet.toolkit.PixmapExtensions;
 
 import static ru.reactiveturtle.reflectthebullet.general.GameData.GAME_FONT;
 
@@ -40,14 +40,14 @@ public class LevelBox {
         this.levelBoxSize = levelBoxSize;
         Color color = Color.BLACK;
         color.a = 0.8f;
-        Image shadow = new Image(new Texture(PixmapHelper.getRoundRectPixmap(
+        Image shadow = new Image(new Texture(PixmapExtensions.getRoundRectPixmap(
                 color, 128, 128, 32)));
         shadow.setBounds(levelBoxSize / 4f + (levelBoxSize + space) * j + levelBoxSize / 32f,
                 Gdx.graphics.getHeight() - levelBoxSize / 4f - levelBoxSize * (i + 1) - space * i - levelBoxSize / 32f - displayMetrics.widthPixels() / 3f,
                 levelBoxSize, levelBoxSize);
         stage.addActor(shadow);
 
-        Image background = new Image(new Texture(PixmapHelper.getRoundRectPixmap(
+        Image background = new Image(new Texture(PixmapExtensions.getRoundRectPixmap(
                 levelTypeColor, 128, 128, 32)));
         background.setUserObject(levelType + "&" + (i * 3 + j + 1));
         background.setBounds(levelBoxSize / 4f + (levelBoxSize + space) * j,
@@ -139,5 +139,6 @@ public class LevelBox {
             widgetList.get(i).remove();
         }
         widgetList.clear();
+        widgetList = null;
     }
 }

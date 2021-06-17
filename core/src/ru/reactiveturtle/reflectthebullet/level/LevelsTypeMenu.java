@@ -14,7 +14,7 @@ import ru.reactiveturtle.reflectthebullet.Button;
 import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
 import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.base.Stage;
-import ru.reactiveturtle.reflectthebullet.general.helpers.PixmapHelper;
+import ru.reactiveturtle.reflectthebullet.toolkit.PixmapExtensions;
 
 public class LevelsTypeMenu extends Stage {
     private final int imageWidth;
@@ -62,7 +62,7 @@ public class LevelsTypeMenu extends Stage {
         VerticalGroup verticalGroup = new VerticalGroup();
         verticalGroup.setSize(displayMetrics.widthPixels(), displayMetrics.heightPixels());
         verticalGroup.setTransform(true);
-        Image image = new Image(PixmapHelper.getLevelTypeMenuItem(textureName, imageWidth, imageHeight));
+        Image image = new Image(PixmapExtensions.getLevelTypeMenuItem(textureName, imageWidth, imageHeight));
         image.setSize(displayMetrics.widthPixels(), imageHeight);
         image.setUserObject(action);
         image.addListener(mClickListener);

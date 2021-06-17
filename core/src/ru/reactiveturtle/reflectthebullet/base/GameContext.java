@@ -8,9 +8,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 
 import java.util.Objects;
 
-import ru.reactiveturtle.reflectthebullet.App;
+import ru.reactiveturtle.reflectthebullet.base.repository.LevelRepositoryImpl;
 import ru.reactiveturtle.reflectthebullet.general.GameData;
-import ru.reactiveturtle.reflectthebullet.general.screens.game.GameScreen;
+import ru.reactiveturtle.reflectthebullet.game.GameScreen;
 import ru.reactiveturtle.reflectthebullet.main.MainMenuController;
 import ru.reactiveturtle.reflectthebullet.main.settings.Settings;
 
@@ -127,7 +127,7 @@ public class GameContext extends ApplicationAdapter {
         return mSettings;
     }
 
-    public LevelRepository getLevelRepository() {
+    public LevelRepositoryImpl getLevelRepository() {
         return mApp.getLevelRepository();
     }
 

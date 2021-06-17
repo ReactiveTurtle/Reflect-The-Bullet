@@ -6,13 +6,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.base.Stage;
-import ru.reactiveturtle.reflectthebullet.general.screens.main.MainMenu;
-import ru.reactiveturtle.reflectthebullet.general.screens.main.SettingsMenu;
 import ru.reactiveturtle.reflectthebullet.level.LevelsMenu;
 import ru.reactiveturtle.reflectthebullet.level.LevelsTypeMenu;
 import ru.reactiveturtle.reflectthebullet.level.LevelType;
 import ru.reactiveturtle.reflectthebullet.level.LevelTypeMapper;
 import ru.reactiveturtle.reflectthebullet.main.settings.Settings;
+import ru.reactiveturtle.reflectthebullet.main.settings.SettingsMenu;
 
 public class MainMenuController extends Stage {
     private SpriteBatch mSpriteBatch;

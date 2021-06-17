@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 
-import ru.reactiveturtle.reflectthebullet.general.helpers.PixmapHelper;
+import ru.reactiveturtle.reflectthebullet.toolkit.PixmapExtensions;
 
 import static ru.reactiveturtle.reflectthebullet.general.GameData.GAME_FONT;
 import static ru.reactiveturtle.reflectthebullet.general.GameData.width;
@@ -35,7 +35,7 @@ public class Button extends TextButton {
         pixmap.fillCircle((int) (getHeight() / 2), (int) (getHeight() / 2), (int) (getHeight() / 2));
         pixmap.fillCircle((int) (getWidth() - getHeight() / 2), (int) (getHeight() / 2), (int) (getHeight() / 2));
         pixmap.fillRectangle((int) (getHeight() / 2f), 0, (int) (getWidth() - getHeight()), (int) getHeight());
-        setTexture(new Texture(PixmapHelper.getRoundRectPixmap(color, (int) getWidth(), (int) getHeight(),
+        setTexture(new Texture(PixmapExtensions.getRoundRectPixmap(color, (int) getWidth(), (int) getHeight(),
                 (int) (getHeight() / 2))), state);
     }
 

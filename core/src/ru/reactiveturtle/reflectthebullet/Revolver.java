@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
-import ru.reactiveturtle.reflectthebullet.objects.Bullet;
+import ru.reactiveturtle.reflectthebullet.game.objects.Bullet;
 
 import static ru.reactiveturtle.reflectthebullet.general.GameData.width;
 

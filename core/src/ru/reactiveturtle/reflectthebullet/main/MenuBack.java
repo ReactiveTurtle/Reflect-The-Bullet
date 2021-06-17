@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Disposable;
 
 import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
 import ru.reactiveturtle.reflectthebullet.base.Drawable;
-import ru.reactiveturtle.reflectthebullet.general.helpers.PixmapHelper;
+import ru.reactiveturtle.reflectthebullet.toolkit.PixmapExtensions;
 import ru.reactiveturtle.reflectthebullet.level.LevelType;
 
 public class MenuBack implements Drawable, Disposable {
@@ -58,8 +58,8 @@ public class MenuBack implements Drawable, Disposable {
             default:
                 throw new EnumConstantNotPresentException(LevelType.class, levelType.name());
         }
-        mMenuBack.setTexture(new Texture(PixmapHelper.castShadow(
-                PixmapHelper.getLevelBack(textureName), 0.5f)));
+        mMenuBack.setTexture(new Texture(PixmapExtensions.castShadow(
+                PixmapExtensions.getLevelBack(textureName), 0.5f)));
     }
 
     public void setMenuBackground() {
