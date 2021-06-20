@@ -20,8 +20,9 @@ import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
 import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.base.repository.LevelRepositoryImpl;
 import ru.reactiveturtle.reflectthebullet.base.Stage;
-import ru.reactiveturtle.reflectthebullet.general.GameData;
 import ru.reactiveturtle.reflectthebullet.level.LevelData;
+import ru.reactiveturtle.reflectthebullet.level.LevelStoreData;
+import ru.reactiveturtle.reflectthebullet.level.StarExtensions;
 import ru.reactiveturtle.reflectthebullet.main.settings.SettingsMenu;
 import ru.reactiveturtle.reflectthebullet.level.world.GameWorld;
 import ru.reactiveturtle.reflectthebullet.level.world.MainWorld;
@@ -64,23 +65,23 @@ public class GameScreen extends Stage {
         pixmap.fillRectangle(0, 0, 100, 100);
         mPauseShadow.setDrawable(new TextureRegionDrawable(new TextureRegion(new Texture(pixmap))));
 
-        mPauseMenu = new PauseMenu();
+        mPauseMenu = new PauseMenu(gameContext);
         mPauseMenu.setActionListener(new PauseMenu.ActionListener() {
             @Override
-            public void onAction(String id) {
-                switch (id) {
-                    case "pause_continue":
-                    case "escape":
+            public void onAction(PauseMenu.Action action) {
+                switch (action) {
+                    case CONTINUE:
+                    case ESCAPE:
                         if (mActionListener != null) {
                             mActionListener.onContinue();
                         }
                         break;
-                    case "pause_settings":
+                    case SETTINGS:
                         mPauseSelectedStage = 1;
                         mSettingsMenu.updateSettings(gameContext.getSettings());
                         Gdx.input.setInputProcessor(mSettingsMenu);
                         break;
-                    case "pause_exit":
+                    case EXIT:
                         if (mActionListener != null) {
                             mActionListener.onExit();
                         }
@@ -188,14 +189,14 @@ public class GameScreen extends Stage {
         mEndLevelMenu = new EndLevelMenu(gameContext);
         mEndLevelMenu.setActionListener(new EndLevelMenu.ActionListener() {
             @Override
-            public void onAction(String id) {
-                switch (id) {
-                    case "exit":
+            public void onAction(EndLevelMenu.Action action) {
+                switch (action) {
+                    case MENU:
                         if (mPauseMenu.getActionListener() != null) {
-                            mPauseMenu.getActionListener().onAction("pause_exit");
+                            mPauseMenu.getActionListener().onAction(PauseMenu.Action.ESCAPE);
                         }
                         break;
-                    case "repeat":
+                    case REPEAT:
                         mMainWorld.dispose();
                         loadCurrentLevel();
                         mScoreStage.updateBestScore(0);
@@ -203,11 +204,11 @@ public class GameScreen extends Stage {
                         updateBulletsCount();
                         start();
                         break;
-                    case "next":
+                    case NEXT:
                         LevelRepositoryImpl levelRepositoryImpl = gameContext.getLevelRepository();
-                        String lastLevelFile = levelRepositoryImpl.getLastLevel().getLevelFile();
-                        LevelData levelData = levelRepositoryImpl.getNextLevel(lastLevelFile);
-                        levelRepositoryImpl.setLastLevel(levelData.getLevelFile());
+                        LevelStoreData levelStoreData = levelRepositoryImpl.getLastLevel();
+                        LevelData levelData = levelRepositoryImpl.getNextLevel(levelStoreData.getLevelFile());
+                        levelRepositoryImpl.setLastLevel(levelData.getLevelStoreData());
                         loadCurrentLevel();
                         start();
                         break;
@@ -259,14 +260,15 @@ public class GameScreen extends Stage {
 
     public void loadCurrentLevel() {
         mMainWorld.dispose();
-        if (!mMainWorld.getLoadedLocation().equals(CURRENT_LOCATION)) {
+        LevelStoreData levelStoreData = getGameContext().getLevelRepository().getLastLevel();
+        if (!mMainWorld.getLoadedLocation().equals(levelStoreData.getLevelFile())) {
             if (mLevelMusic != null) {
                 mLevelMusic.dispose();
             }
-            mLevelMusic = Helper.loadLevelMusic(GameData.CURRENT_LOCATION);
+            mLevelMusic = Helper.loadLevelMusic(getGameContext().getLevelRepository().getLastLevel().getLevelType());
             startMusic();
         }
-        mMainWorld.loadLevel(CURRENT_LOCATION, CURRENT_LEVEL);
+        mMainWorld.loadLevel(levelStoreData.getLevelFile());
         mScoreStage.updateBestScore(0);
 
         updateBulletsCount();
@@ -309,20 +311,20 @@ public class GameScreen extends Stage {
                 if (mMainWorld.getBullet() == null && mMainWorld.getRevolver().getBulletsCount() == 0) {
                     mEndLevelMenu.draw();
                     if (Gdx.input.getInputProcessor().hashCode() != mEndLevelMenu.hashCode()) {
-                        LevelData levelData = mAppInterface.getLevelData(CURRENT_LOCATION, CURRENT_LEVEL);
-                        LevelData nextLevel = mAppInterface.getNextLevel(CURRENT_LOCATION, CURRENT_LEVEL);
-                        if ((levelData.isFinished || mMainWorld.getBestScore() >= levelData.firstStarScore) && nextLevel != null) {
+                        LevelRepositoryImpl levelRepository = getGameContext().getLevelRepository();
+                        LevelStoreData levelStoreData = levelRepository.getLastLevel();
+                        LevelData levelData = levelRepository.getLevelData(levelStoreData.getLevelFile());
+                        LevelData nextLevel = levelRepository.getNextLevel(levelStoreData.getLevelFile());
+                        if ((levelData.isFinished() || mMainWorld.getBestScore() >= levelData.getRequirements().getFirstStarScore()) && nextLevel != null) {
                             mEndLevelMenu.enableNextLevelButton();
                         } else {
                             mEndLevelMenu.disableNextLevelButton();
                         }
-                        mAppInterface.setLevelInfo(CURRENT_LOCATION, CURRENT_LEVEL,
-                                levelData.bestScore < mMainWorld.getBestScore() ? mMainWorld.getBestScore() : levelData.bestScore,
-                                levelData.isFinished || mMainWorld.getBestScore() >= mAppInterface.getLevelData(CURRENT_LOCATION, CURRENT_LEVEL).firstStarScore);
-                        mEndLevelMenu.showScore(mAppInterface.getLevelData(CURRENT_LOCATION, CURRENT_LEVEL).bestScore,
-                                mMainWorld.getBestScore(), mMainWorld.getBestScore() < levelData.firstStarScore ? 0 :
-                                        mMainWorld.getBestScore() < levelData.secondStarScore ? 1 :
-                                                mMainWorld.getBestScore() < levelData.thirdStarScore ? 2 : 3);
+                        levelRepository.setLevelData(levelData.getLevelStoreData(),
+                                Math.max(levelData.getBestScore(), mMainWorld.getBestScore()),
+                                levelData.isFinished() || mMainWorld.getBestScore() >= levelRepository.getLevelData(levelData.getLevelStoreData().getLevelFile()).getRequirements().getFirstStarScore());
+                        mEndLevelMenu.showScore(levelRepository.getLevelData(levelData.getLevelStoreData().getLevelFile()).getBestScore(),
+                                mMainWorld.getBestScore(), StarExtensions.getStars(mMainWorld.getBestScore(), levelData.getRequirements()));
                         pause();
                         Gdx.input.setInputProcessor(mEndLevelMenu);
                     }

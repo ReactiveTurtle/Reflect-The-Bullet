@@ -15,12 +15,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import ru.reactiveturtle.reflectthebullet.game.GameScreen;
-import ru.reactiveturtle.reflectthebullet.base.Renderable;
-import ru.reactiveturtle.reflectthebullet.game.objects.Bullet;
 import ru.reactiveturtle.reflectthebullet.Helper;
 import ru.reactiveturtle.reflectthebullet.Revolver;
-import ru.reactiveturtle.reflectthebullet.game.objects.StaticObject;
+import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
+import ru.reactiveturtle.reflectthebullet.base.Renderable;
+import ru.reactiveturtle.reflectthebullet.base.loader.SoundLoader;
+import ru.reactiveturtle.reflectthebullet.game.GameScreen;
+import ru.reactiveturtle.reflectthebullet.game.objects.Bullet;
+import ru.reactiveturtle.reflectthebullet.game.objects.reflectors.Reflector;
+import ru.reactiveturtle.reflectthebullet.main.settings.Settings;
+import ru.reactiveturtle.reflectthebullet.toolkit.FileUtils;
 
 public class MainWorld implements GameWorld, Keeper {
     private GameScreen mGameScreen;
@@ -34,15 +38,17 @@ public class MainWorld implements GameWorld, Keeper {
     private Sprite mAim;
     private Bullet mBullet;
     private ParticleEffect mSparks;
-    private int mScore = 0;
-    private int mBestScore = 0;
-    private List<StaticObject> mStaticObjects = new ArrayList<StaticObject>();
+
+    private List<Reflector> mReflectors = new ArrayList<>();
 
     public MainWorld(GameScreen gameScreen) {
         mGameScreen = gameScreen;
+
+        DisplayMetrics displayMetrics = gameScreen.getGameContext().getDisplayMetrics();
+
         mWorld = new World(new Vector2(0, -0.5f), false);
 
-        mRevolver = new Revolver(new Texture(Gdx.files.internal("revolver.png")));
+        mRevolver = new Revolver(gameScreen.getGameContext(), mWorld);
         mRevolver.setOnShotListener(new Revolver.OnShotListener() {
             @Override
             public void onShot(Bullet bullet) {
@@ -61,22 +67,23 @@ public class MainWorld implements GameWorld, Keeper {
         mSparks = new ParticleEffect();
         mSparks.load(Gdx.files.internal("rikoshet_sparks.p"), Gdx.files.internal(""));
         ParticleEmitter emitter = mSparks.getEmitters().get(0);
-        emitter.scaleSize(width() / 480f);
+        emitter.scaleSize(displayMetrics.widthPixels() / 480f);
     }
 
     private void initAim() {
+        DisplayMetrics displayMetrics = mGameScreen.getGameContext().getDisplayMetrics();
         mAim = new Sprite(new Texture(Gdx.files.internal("aim.png")));
         mAim.setPosition(0, 0);
-        mAim.setSize(width() / 8f, width() / 8f);
+        mAim.setSize(displayMetrics.widthPixels() / 8f, displayMetrics.widthPixels() / 8f);
         mAim.setOriginCenter();
     }
 
     @Override
-    public void loadLevel(String levelName, int levelIndex) {
+    public void loadLevel(String levelFile) {
         try {
-            mLoadedLocation = levelName;
-            Level level = (Level) Class.forName("ru.reactiveturtle.reflectthebullet.level.world.Levels$Level_" + levelName + levelIndex).newInstance();
-            level.loadTo(this, mWorld);
+            mLoadedLocation = levelFile;
+            Level level = mGameScreen.getGameContext().getLevelLoader()
+                    .load(mGameScreen.getGameContext(), mWorld, FileUtils.getFileObject(mLoadedLocation));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -93,15 +100,16 @@ public class MainWorld implements GameWorld, Keeper {
             mBackList.get(i).draw(spriteBatch);
         }
         for (int i = 0; i < mRenderables.size(); i++) {
-            mRenderables.get(i).draw(spriteBatch, Gdx.graphics.getDeltaTime());
+            mRenderables.get(i).draw();
         }
     }
 
     @Override
     public void drawObjects(SpriteBatch spriteBatch) {
+        DisplayMetrics displayMetrics = mGameScreen.getGameContext().getDisplayMetrics();
         if (mBullet != null) {
-            mBullet.syncSprite(ONE_METER);
-            if (Helper.isVisibleInScreen(mBullet, width(), height()) &&
+            mBullet.syncSprite(displayMetrics.getOneMeterPixels());
+            if (Helper.isVisibleInScreen(mBullet.getSprite(), displayMetrics.widthPixels(), displayMetrics.widthPixels()) &&
                     mBullet.getBody().isAwake() &&
                     mBullet.getBody().getUserData() != null &&
                     (Math.abs(mBullet.getBody().getLinearVelocity().x) > 0.01f)) {
@@ -114,10 +122,11 @@ public class MainWorld implements GameWorld, Keeper {
 
         mRevolver.draw(spriteBatch);
 
-        for (int i = 0; i < mStaticObjects.size(); i++) {
-            StaticObject staticObject = mStaticObjects.get(i);
-            staticObject.getPhysical().syncSprite(ONE_METER);
-            staticObject.getSprite().draw(spriteBatch);
+        float oneMeter = displayMetrics.getOneMeterPixels();
+        for (int i = 0; i < mReflectors.size(); i++) {
+            Reflector reflector = mReflectors.get(i);
+            reflector.syncSprite(oneMeter);
+            reflector.draw(spriteBatch);
         }
         mSparks.draw(spriteBatch);
         mSparks.update(Gdx.graphics.getDeltaTime());
@@ -167,15 +176,16 @@ public class MainWorld implements GameWorld, Keeper {
             mRenderables.get(i).dispose();
         }
         mRenderables.clear();
-        for (int i = 0; i < mStaticObjects.size(); i++) {
-            mStaticObjects.get(i).getPhysical().disposeObject();
+        for (int i = 0; i < mReflectors.size(); i++) {
+            mReflectors.get(i).dispose();
         }
-        mStaticObjects.clear();
+        mReflectors.clear();
         if (mBullet != null) {
             mBullet = null;
         }
         mRevolver.reset(mWorld);
-        mAim.setPosition(width() / 2f, mRevolver.getVertices()[11] - mAim.getHeight() / 2f - mRevolver.getHeight() * 24f / 283f);
+        DisplayMetrics displayMetrics = mGameScreen.getGameContext().getDisplayMetrics();
+        mAim.setPosition((displayMetrics.widthPixels()) / 2f, mRevolver.getVertices()[11] - mAim.getHeight() / 2f - mRevolver.getHeight() * 24f / 283f);
     }
 
     @Override
@@ -191,11 +201,6 @@ public class MainWorld implements GameWorld, Keeper {
     @Override
     public void setScoreTableParams(Color textColor, int y) {
         mGameScreen.setScoreTableParams(textColor, y);
-    }
-
-    @Override
-    public void putStaticObjects(List<StaticObject> staticObjects) {
-        mStaticObjects.addAll(staticObjects);
     }
 
     @Override
@@ -234,37 +239,42 @@ public class MainWorld implements GameWorld, Keeper {
 
     @Override
     public void playSound(String name) {
-        if (!IS_SOUND_FX_PLAYING) {
+        Settings settings = mGameScreen.getGameContext().getSettings();
+        if (!settings.isSoundFxPlaying()) {
             return;
         }
+        SoundLoader soundLoader = mGameScreen.getGameContext().getSoundLoader();
         switch (name) {
             case "shot":
-                shotSound.play(SOUND_FX_VOLUME);
+                soundLoader.getShotSound().play(settings.getSoundFxVolume());
                 break;
             case "bullet_to_target":
-                bulletToTargetSound.play(SOUND_FX_VOLUME);
+                soundLoader.getBulletToTargetSound().play(settings.getSoundFxVolume());
                 break;
             case "rikoshet1":
-                rikoshetSound1.play(SOUND_FX_VOLUME);
+                soundLoader.getRikoshetSound1().play(settings.getSoundFxVolume());
                 break;
             case "rikoshet2":
-                rikoshetSound2.play(SOUND_FX_VOLUME);
+                soundLoader.getRikoshetSound2().play(settings.getSoundFxVolume());
                 break;
             case "rikoshet3":
-                rikoshetSound3.play(SOUND_FX_VOLUME);
+                soundLoader.getRikoshetSound3().play(settings.getSoundFxVolume());
                 break;
             case "rikoshet4":
-                rikoshetSound4.play(SOUND_FX_VOLUME);
+                soundLoader.getRikoshetSound4().play(settings.getSoundFxVolume());
                 break;
             case "hit":
-                hitSound.play(SOUND_FX_VOLUME);
+                soundLoader.getHitSound().play(settings.getSoundFxVolume());
                 break;
         }
     }
 
     @Override
     public void showRikoshetSparks(Vector2 collisionPoint) {
-        mSparks.getEmitters().get(0).setPosition(collisionPoint.x * ONE_METER, collisionPoint.y * ONE_METER);
+        DisplayMetrics displayMetrics = mGameScreen.getGameContext().getDisplayMetrics();
+        mSparks.getEmitters().get(0).setPosition(
+                collisionPoint.x * displayMetrics.getOneMeterPixels(),
+                collisionPoint.y * displayMetrics.getOneMeterPixels());
         mSparks.start();
     }
 

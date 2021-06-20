@@ -8,7 +8,7 @@ import ru.reactiveturtle.reflectthebullet.Revolver;
 import ru.reactiveturtle.reflectthebullet.game.objects.Bullet;
 
 public interface GameWorld {
-    void loadLevel(String levelName, int levelIndex);
+    void loadLevel(String levelFile);
 
     String getLoadedLocation();
 

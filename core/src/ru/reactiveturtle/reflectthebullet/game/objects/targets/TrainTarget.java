@@ -11,52 +11,41 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import ru.reactiveturtle.reflectthebullet.Helper;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
+import ru.reactiveturtle.reflectthebullet.game.objects.Entity;
 import ru.reactiveturtle.reflectthebullet.game.objects.Physical;
 import ru.reactiveturtle.reflectthebullet.game.objects.StaticObject;
 
-public class TrainTarget extends Sprite implements StaticObject, Physical {
-    private Body mBody;
-
-    public TrainTarget(float width, float height, Texture texture) {
-        super(texture);
+public class TrainTarget extends Entity implements StaticObject, Physical {
+    public TrainTarget(GameContext gameContext,
+                       World world,
+                       float width,
+                       float height) {
+        super(gameContext, world, gameContext.getTextureLoader().getTrainTargetTexture());
         setSize(width, height);
         setOrigin(0, 0);
     }
 
     @Override
-    public void createBody(World world) {
-        float oneMeter = ONE_METER;
+    public Body createBody(World world) {
+        float oneMeter = getGameContext().getDisplayMetrics().getOneMeterPixels();
         BodyDef def = new BodyDef();
         def.type = BodyDef.BodyType.StaticBody;
         def.angle = (float) Math.toRadians(getRotation());
         def.position.set(getX() / oneMeter, getY() / oneMeter);
-        mBody = world.createBody(def);
+        Body body = world.createBody(def);
 
         PolygonShape polygonShape = new PolygonShape();
         polygonShape.set(getUsualVertices(oneMeter));
-        Fixture fixture = mBody.createFixture(polygonShape, 0f);
+        Fixture fixture = body.createFixture(polygonShape, 0f);
         fixture.setRestitution(0f);
-        mBody.setUserData("target");
+        body.setUserData("target");
         polygonShape.dispose();
+        return body;
     }
 
-    @Override
     public void syncSprite(float oneMeter) {
-        Helper.syncSpriteWithBody(this, mBody, oneMeter);
-    }
-
-    @Override
-    public Body getBody() {
-        return mBody;
-    }
-
-    @Override
-    public void disposeObject() {
-        for (int i = 0; i < mBody.getFixtureList().size; i++) {
-            mBody.destroyFixture(mBody.getFixtureList().get(i));
-            i--;
-        }
-        getTexture().dispose();
+        Helper.syncSpriteWithBody(getSprite(), getBody(), oneMeter);
     }
 
     private float[] getUsualVertices(float oneMeter) {
@@ -79,11 +68,6 @@ public class TrainTarget extends Sprite implements StaticObject, Physical {
 
     @Override
     public Physical getPhysical() {
-        return this;
-    }
-
-    @Override
-    public Sprite getSprite() {
         return this;
     }
 }

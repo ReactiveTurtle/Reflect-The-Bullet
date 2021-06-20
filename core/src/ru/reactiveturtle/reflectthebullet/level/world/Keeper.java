@@ -8,7 +8,6 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import java.util.List;
 
 import ru.reactiveturtle.reflectthebullet.base.Renderable;
-import ru.reactiveturtle.reflectthebullet.game.objects.StaticObject;
 
 public interface Keeper {
     void putBackground(List<Sprite> backList);
@@ -16,8 +15,6 @@ public interface Keeper {
     void addVisualManager(Renderable renderable);
 
     void setScoreTableParams(Color textColor, int y);
-
-    void putStaticObjects(List<StaticObject> reflectors);
 
     void putContactListener(ContactListener contactListener);
 

@@ -62,13 +62,13 @@ public class LevelsTypeMenu extends Stage {
         VerticalGroup verticalGroup = new VerticalGroup();
         verticalGroup.setSize(displayMetrics.widthPixels(), displayMetrics.heightPixels());
         verticalGroup.setTransform(true);
-        Image image = new Image(PixmapExtensions.getLevelTypeMenuItem(textureName, imageWidth, imageHeight));
+        Image image = new Image(PixmapExtensions.getLevelTypeMenuItem(getGameContext().getDisplayMetrics(), textureName, imageWidth, imageHeight));
         image.setSize(displayMetrics.widthPixels(), imageHeight);
         image.setUserObject(action);
         image.addListener(mClickListener);
         verticalGroup.addActor(image);
 
-        Button button = new Button("Открыть");
+        Button button = new Button(getGameContext().getDisplayMetrics(), "Открыть");
         button.setSize(displayMetrics.widthPixels() / 2f, displayMetrics.widthPixels() / 8f);
         button.setColor(BUTTON_UP_COLOR, Button.TouchState.UP);
         button.setColor(BUTTON_DOWN_COLOR, Button.TouchState.DOWN);

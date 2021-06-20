@@ -8,14 +8,22 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 
 import java.util.Objects;
 
+import ru.reactiveturtle.reflectthebullet.base.loader.LevelLoader;
+import ru.reactiveturtle.reflectthebullet.base.loader.SoundLoader;
+import ru.reactiveturtle.reflectthebullet.base.loader.TextureLoader;
 import ru.reactiveturtle.reflectthebullet.base.repository.LevelRepositoryImpl;
 import ru.reactiveturtle.reflectthebullet.general.GameData;
 import ru.reactiveturtle.reflectthebullet.game.GameScreen;
+import ru.reactiveturtle.reflectthebullet.level.LevelStoreData;
 import ru.reactiveturtle.reflectthebullet.main.MainMenuController;
 import ru.reactiveturtle.reflectthebullet.main.settings.Settings;
 
 public class GameContext extends ApplicationAdapter {
-    private App mApp;
+    private TextureLoader mTextureLoader;
+    private SoundLoader mSoundLoader;
+    private LevelLoader mLevelLoader;
+
+    private AppProviderImpl mAppProvider;
     private DisplayMetrics mDisplayMetrics;
     private Settings mSettings;
 
@@ -24,8 +32,10 @@ public class GameContext extends ApplicationAdapter {
 
     private OrthographicCamera mCamera;
 
-    public GameContext(App app) {
-        this.mApp = app;
+    public GameContext(AppProviderImpl appProvider) {
+        mTextureLoader = new TextureLoader();
+        mSoundLoader = new SoundLoader();
+        this.mAppProvider = appProvider;
         mDisplayMetrics = new DisplayMetrics();
     }
 
@@ -46,8 +56,8 @@ public class GameContext extends ApplicationAdapter {
             }
 
             @Override
-            public void onLoadLevel(String levelFile) {
-                getLevelRepository().setLastLevel(levelFile);
+            public void onLoadLevel(LevelStoreData levelStoreData) {
+                getLevelRepository().setLastLevel(levelStoreData);
                 mMainMenuController.hide();
 
                 mGameScreen.loadCurrentLevel();
@@ -100,7 +110,7 @@ public class GameContext extends ApplicationAdapter {
     }
 
     private void loadGameData() {
-        mSettings = mApp.getSettingsRepository().getSettings();
+        mSettings = mAppProvider.getSettingsRepository().getSettings();
     }
 
     public void onResume() {
@@ -128,12 +138,24 @@ public class GameContext extends ApplicationAdapter {
     }
 
     public LevelRepositoryImpl getLevelRepository() {
-        return mApp.getLevelRepository();
+        return mAppProvider.getLevelRepository();
     }
 
     public void updateSettings(Settings settings) {
         Objects.requireNonNull(settings);
-        mApp.getSettingsRepository().setSettings(settings);
+        mAppProvider.getSettingsRepository().setSettings(settings);
         mSettings = settings;
+    }
+
+    public TextureLoader getTextureLoader() {
+        return mTextureLoader;
+    }
+
+    public SoundLoader getSoundLoader() {
+        return mSoundLoader;
+    }
+
+    public LevelLoader getLevelLoader() {
+        return null;
     }
 }

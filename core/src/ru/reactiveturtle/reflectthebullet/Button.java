@@ -11,21 +11,22 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 
+import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.toolkit.PixmapExtensions;
 
 import static ru.reactiveturtle.reflectthebullet.general.GameData.GAME_FONT;
-import static ru.reactiveturtle.reflectthebullet.general.GameData.width;
 
 public class Button extends TextButton {
     private TextureRegionDrawable mTextureRegionDrawable;
 
-    public Button() {
-        super("", getTextButtonStyle());
+    public Button(DisplayMetrics displayMetrics) {
+        super("", getTextButtonStyle(displayMetrics));
         init();
     }
 
-    public Button(String text) {
-        super(text, getTextButtonStyle());
+    public Button(DisplayMetrics displayMetrics, String text) {
+        super(text, getTextButtonStyle(displayMetrics));
         init();
     }
 
@@ -78,11 +79,11 @@ public class Button extends TextButton {
         getStyle().up = mTextureRegionDrawable;
     }
 
-    private static TextButtonStyle getTextButtonStyle() {
+    private static TextButtonStyle getTextButtonStyle(DisplayMetrics displayMetrics) {
         TextButtonStyle textButtonStyle = new TextButtonStyle();
         textButtonStyle.font = new BitmapFont(Gdx.files.internal(GAME_FONT));
         textButtonStyle.font.setColor(Color.WHITE);
-        textButtonStyle.font.getData().setScale(width() / 1536f);
+        textButtonStyle.font.getData().setScale(displayMetrics.widthPixels() / 1536f);
         return textButtonStyle;
     }
 

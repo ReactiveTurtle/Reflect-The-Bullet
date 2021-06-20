@@ -42,14 +42,12 @@ public class LevelsMenu extends Stage {
         mLevelBoxes.clear();
         int levelBoxSize = (int) (displayMetrics.widthPixels() / 4f);
         int space = (int) (levelBoxSize / 4f);
-        LevelData lastLevelData = new LevelData();
         Color color = getLevelTypeColor(levelType);
         for (int i = 0; i < levelDataList.size() / 3f; i++) {
             for (int j = 0; j < (levelDataList.size() / 3 == i ? levelDataList.size() % 3 : 3); j++) {
                 LevelData levelData = levelDataList.get(i * 3 + j);
                 mLevelBoxes.add(new LevelBox(this, levelType, color,
-                        levelData, lastLevelData, i, j, levelBoxSize, space, mClickListener));
-                lastLevelData = levelData;
+                        levelData, i, j, levelBoxSize, space, mClickListener));
             }
         }
     }
@@ -82,7 +80,7 @@ public class LevelsMenu extends Stage {
             super.clicked(event, x, y);
             mLevelBoxes.get(Integer.parseInt(((String) event.getListenerActor().getUserObject()).split("&")[1]) - 1).release();
             if (actionListener != null) {
-                actionListener.onAction((Action) event.getListenerActor().getUserObject());
+                actionListener.onLevelClick((LevelStoreData) event.getListenerActor().getUserObject());
             }
         }
     };
@@ -94,7 +92,7 @@ public class LevelsMenu extends Stage {
     public interface ActionListener {
         void onAction(Action action);
 
-        void onLevelClick(String levelFile);
+        void onLevelClick(LevelStoreData levelStoreData);
     }
 
     private Color getLevelTypeColor(LevelType levelType) {

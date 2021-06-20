@@ -26,7 +26,7 @@ public class GameStage extends Stage {
 
         DisplayMetrics displayMetrics = gameContext.getDisplayMetrics();
 
-        shootButton = new Button("");
+        shootButton = new Button(displayMetrics, "");
         shootButton.setUserObject("shoot");
         shootButton.getColor().a = 0.8f;
         shootButton.setSize(displayMetrics.widthPixels() / 6f, displayMetrics.widthPixels() / 6f);

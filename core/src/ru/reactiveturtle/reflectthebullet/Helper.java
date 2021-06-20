@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
+import ru.reactiveturtle.reflectthebullet.level.LevelType;
+
 public class Helper {
     public static boolean isVisibleInScreen(Sprite sprite, float width, float height) {
         float[] vertices = sprite.getVertices();
@@ -27,14 +29,14 @@ public class Helper {
                 body.getWorldCenter().y * oneMeter + center1.y - center2.y);
     }
 
-    public static Music loadLevelMusic(String locationName) {
+    public static Music loadLevelMusic(LevelType levelType) {
         Music music = null;
-        switch (locationName) {
-            case "desert_open":
+        switch (levelType) {
+            case DESERT:
                 music = Gdx.audio.newMusic(Gdx.files.internal("music/desert_theme.mp3"));
                 music.setLooping(true);
                 break;
-            case "celt_open":
+            case CELT:
                 music = Gdx.audio.newMusic(Gdx.files.internal("music/celt_theme.mp3"));
                 music.setLooping(true);
                 break;

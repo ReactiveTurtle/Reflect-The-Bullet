@@ -1,33 +1,10 @@
 package ru.reactiveturtle.reflectthebullet.level.world;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Manifold;
-import com.badlogic.gdx.physics.box2d.World;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import ru.reactiveturtle.reflectthebullet.toolkit.PixmapExtensions;
-import ru.reactiveturtle.reflectthebullet.game.objects.StaticObject;
-import ru.reactiveturtle.reflectthebullet.game.objects.reflectors.BoxReflector;
-import ru.reactiveturtle.reflectthebullet.game.objects.reflectors.RectangleReflector;
-import ru.reactiveturtle.reflectthebullet.game.objects.reflectors.TriangleReflector;
-import ru.reactiveturtle.reflectthebullet.game.objects.targets.TrainTarget;
-
-
 public final class Levels {
     private Levels() {
     }
 
-    public static class Level_desert_open1 implements Level {
+    /*public static class Level_desert_open1 implements Level {
         @Override
         public void loadTo(Keeper keeper, World world) {
             keeper.addVisualManager(LevelHelper.getClouds());
@@ -394,5 +371,5 @@ public final class Levels {
 
             }
         };
-    }
+    }*/
 }

@@ -15,8 +15,10 @@ import ru.reactiveturtle.reflectthebullet.level.LevelType;
 public class MenuBack implements Drawable, Disposable {
     private Sprite mMenuBack;
     private Texture mMenuBackTexture;
+    private DisplayMetrics displayMetrics;
 
     public MenuBack(DisplayMetrics displayMetrics) {
+        this.displayMetrics = displayMetrics;
         Texture texture = new Texture(Gdx.files.internal("sky.png"));
         texture.getTextureData().prepare();
         Pixmap src = texture.getTextureData().consumePixmap();
@@ -59,7 +61,7 @@ public class MenuBack implements Drawable, Disposable {
                 throw new EnumConstantNotPresentException(LevelType.class, levelType.name());
         }
         mMenuBack.setTexture(new Texture(PixmapExtensions.castShadow(
-                PixmapExtensions.getLevelBack(textureName), 0.5f)));
+                PixmapExtensions.getLevelBack(displayMetrics, textureName), 0.5f)));
     }
 
     public void setMenuBackground() {

@@ -2,30 +2,31 @@ package ru.reactiveturtle.reflectthebullet;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
+import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.game.objects.Bullet;
+import ru.reactiveturtle.reflectthebullet.game.objects.Entity;
 
-import static ru.reactiveturtle.reflectthebullet.general.GameData.width;
-
-public class Revolver extends Sprite {
+public class Revolver extends Entity {
     private Sound mEmptyClipSnapSound = Gdx.audio.newSound(Gdx.files.internal("empty_clip_snap.ogg"));
     private Bullet mBullet;
-    private float mBulletSpeed = 10f;
+    public static float BULLET_SPEED = 10f;
     private int mBulletsCount = 6;
 
     private OnShotListener mOnShotListener;
 
-    public Revolver(Texture texture) {
-        super(texture);
+    public Revolver(GameContext gameContext, World world) {
+        super(gameContext, world, gameContext.getTextureLoader().getRevolverTexture());
     }
 
-    public void setBulletSpeed(float bulletSpeed) {
-        this.mBulletSpeed = bulletSpeed;
+    @Override
+    protected Body createBody(World world) {
+        return null;
     }
 
     public int getBulletsCount() {
@@ -63,13 +64,15 @@ public class Revolver extends Sprite {
         if (mBullet != null) {
             mBullet.disposeObject();
         }
+
+        DisplayMetrics displayMetrics = getGameContext().getDisplayMetrics();
+
         mBulletsCount = 6;
         setRotation(0);
-        setPosition(width() / 8f, width() / 5f);
-        setSize(width() / 3f, width() / 3f * getHeight() / getWidth());
+        setPosition(displayMetrics.widthPixels() / 8f, displayMetrics.widthPixels() / 5f);
+        setSize(displayMetrics.widthPixels() / 3f, displayMetrics.widthPixels() / 3f * getHeight() / getWidth());
         setOriginCenter();
-        mBullet = new Bullet(mBulletSpeed);
-        mBullet.setSpeed(mBulletSpeed);
+        mBullet = new Bullet(getGameContext(), world);
         mBullet.setRotation(getRotation());
         mBullet.setSize(40f / 283 * getHeight(), 40f / 283 * getHeight());
         mBullet.setOriginCenter();
@@ -83,16 +86,6 @@ public class Revolver extends Sprite {
         mBullet.setPosition(getVertices()[10] + start.x * bias, getVertices()[11] + start.y * bias);
         mBullet.syncBody();
         mBullet.getBody().setType(BodyDef.BodyType.StaticBody);
-    }
-
-    @Override
-    public void setRotation(float degrees) {
-        super.setRotation(degrees);
-    }
-
-    @Override
-    public void rotate(float degrees) {
-        super.rotate(degrees);
     }
 
     private float[] getUsualVertices() {

@@ -9,17 +9,15 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 
 import ru.reactiveturtle.reflectthebullet.Helper;
+import ru.reactiveturtle.reflectthebullet.Revolver;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
 
 public class Bullet extends Entity {
     private float mSpeed;
 
-    public Bullet(World world) {
-        super(world, "bullet.png");
-        mSpeed = speed;
-    }
-
-    public void setSpeed(float speed) {
-        mSpeed = speed;
+    public Bullet(GameContext gameContext, World world) {
+        super(gameContext, world, gameContext.getTextureLoader().getBulletTexture());
+        mSpeed = Revolver.BULLET_SPEED;
     }
 
     public float getSpeed() {
@@ -27,22 +25,24 @@ public class Bullet extends Entity {
     }
 
     public void setId(int id) {
-        mBody.setUserData("bullet" + id);
+        getBody().setUserData("bullet" + id);
     }
 
     @Override
     public Body createBody(World world) {
         Sprite sprite = getSprite();
 
+        float oneMeter = getGameContext().getDisplayMetrics().getOneMeterPixels();
+
         BodyDef def = new BodyDef();
         def.type = BodyDef.BodyType.DynamicBody;
         def.angle = (float) Math.toRadians(getRotation());
-        def.position.set(sprite.getX() / ONE_METER, sprite.getY() / ONE_METER);
+        def.position.set(sprite.getX() / oneMeter, sprite.getY() / oneMeter);
         Body body = world.createBody(def);
         body.setBullet(true);
 
         CircleShape circleShape = new CircleShape();
-        circleShape.setRadius(getWidth() / ONE_METER / 2f);
+        circleShape.setRadius(getWidth() / oneMeter / 2f);
         Fixture fixture = body.createFixture(circleShape, 1f);
         fixture.setRestitution(0.6f);
         circleShape.dispose();
@@ -54,15 +54,14 @@ public class Bullet extends Entity {
         return body;
     }
 
-    @Override
     public void syncSprite(float oneMeter) {
-        Helper.syncSpriteWithBody(this, mBody, oneMeter);
+        Helper.syncSpriteWithBody(getSprite(), getBody(), oneMeter);
     }
 
-
     public void syncBody() {
-        mBody.setAngularVelocity(0);
-        mBody.setTransform(getX() / ONE_METER, getY() / ONE_METER, (float) Math.toRadians(getRotation()));
+        float oneMeter = getGameContext().getDisplayMetrics().getOneMeterPixels();
+        getBody().setAngularVelocity(0);
+        getBody().setTransform(getX() / oneMeter, getY() / oneMeter, (float) Math.toRadians(getRotation()));
     }
 
     private float[] getUsualVertices(float oneMeter) {
@@ -72,5 +71,8 @@ public class Bullet extends Entity {
             usualVertices[i * 2 + 1] = getVertices()[i * 5 + 1] / oneMeter;
         }
         return usualVertices;
+    }
+
+    public void disposeObject() {
     }
 }

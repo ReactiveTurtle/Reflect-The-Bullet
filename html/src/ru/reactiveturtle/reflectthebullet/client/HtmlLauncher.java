@@ -3,7 +3,8 @@ package ru.reactiveturtle.reflectthebullet.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import ru.reactiveturtle.reflectthebullet.MainGame;
+
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
 
 public class HtmlLauncher extends GwtApplication {
 
@@ -46,6 +47,6 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener createApplicationListener () {
-                return new MainGame();
+                return new GameContext(null);
         }
 }

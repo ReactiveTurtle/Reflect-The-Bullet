@@ -14,11 +14,7 @@ public class DesktopLauncher {
         config.width = 540;
         config.height = 960;
         config.title = APP_NAME;
-        try {
-            AppDesktopProvider appDesktopProvider = new AppDesktopProvider();
-            new LwjglApplication(new GameContext(appDesktopProvider), config);
-        } catch (FileSystemException e) {
-            e.printStackTrace();
-        }
+        AppDesktopProvider appDesktopProvider = new AppDesktopProvider();
+        new LwjglApplication(new GameContext(appDesktopProvider), config);
     }
 }

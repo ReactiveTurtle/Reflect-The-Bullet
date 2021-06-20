@@ -1,6 +1,8 @@
 package ru.reactiveturtle.reflectthebullet.level;
 
-public class LevelRequirements {
+import ru.reactiveturtle.reflectthebullet.toolkit.JSONSerializable;
+
+public class LevelRequirements implements JSONSerializable {
     private int firstStarScore;
     private int secondStarScore;
     private int thirdStarScore;
@@ -21,5 +23,10 @@ public class LevelRequirements {
 
     public int getThirdStarScore() {
         return thirdStarScore;
+    }
+
+    @Override
+    public String serialize() {
+        return null;
     }
 }

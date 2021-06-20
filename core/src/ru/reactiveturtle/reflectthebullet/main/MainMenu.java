@@ -18,7 +18,7 @@ public class MainMenu extends Stage {
     public MainMenu(GameContext gameContext) {
         super(gameContext);
         BUTTON_WIDTH =  gameContext.getDisplayMetrics().widthPixels() / 2;
-        BUTTON_HEIGHT = gameContext.getDisplayMetrics().heightPixels() / 8;
+        BUTTON_HEIGHT = gameContext.getDisplayMetrics().heightPixels() / 12;
 
         createButton(
                 "Продолжить",
@@ -42,7 +42,7 @@ public class MainMenu extends Stage {
     }
 
     private void createButton(String text, Action action, float y) {
-        Button button = new Button(text);
+        Button button = new Button(getGameContext().getDisplayMetrics(), text);
         button.setUserObject(action);
         button.setSize(BUTTON_WIDTH, BUTTON_HEIGHT);
         button.setX(getGameContext().getDisplayMetrics().widthPixels() / 2f - button.getWidth() / 2f);

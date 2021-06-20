@@ -1,0 +1,10 @@
+{
+    "reflectors": [
+        {
+            "type": "RECTANGLE",
+            "texture": "sand_block.png",
+            "x": 0,
+            "y": 0
+        }
+    ]
+}

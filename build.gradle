@@ -46,6 +46,7 @@ project(":desktop") {
 
     dependencies {
         implementation project(":core")
+        implementation 'org.json:json:20210307'
         api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
@@ -63,6 +64,7 @@ project(":android") {
 
     dependencies {
         implementation project(":core")
+        implementation 'org.json:json:20210307'
         api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
@@ -121,8 +123,7 @@ project(":core") {
 
 
     dependencies {
-        implementation 'com.fasterxml.jackson.core:jackson-annotations'
-        implementation 'com.fasterxml.jackson.core:jackson-databind'
+        implementation 'org.json:json:20210307'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"

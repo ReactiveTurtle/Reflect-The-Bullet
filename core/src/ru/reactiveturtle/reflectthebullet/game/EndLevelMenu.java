@@ -15,6 +15,7 @@ import ru.reactiveturtle.reflectthebullet.Button;
 import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
 import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.base.Stage;
+import ru.reactiveturtle.reflectthebullet.level.StarExtensions;
 
 import static ru.reactiveturtle.reflectthebullet.general.GameData.GAME_FONT;
 
@@ -40,30 +41,30 @@ public class EndLevelMenu extends Stage {
         bestScoreLabel.setPosition(displayMetrics.widthPixels() / 2f - displayMetrics.widthPixels() / 3f, displayMetrics.heightPixels() * 2 / 3f);
         addActor(bestScoreLabel);
 
-        Button exitButton = new Button("М");
+        Button exitButton = new Button(displayMetrics, "М");
         exitButton.setColor(Color.FOREST);
         exitButton.setSize(displayMetrics.widthPixels() / 6f, displayMetrics.widthPixels() / 6f);
         exitButton.setX(displayMetrics.widthPixels() / 2f - exitButton.getWidth() * 3 / 2f - exitButton.getWidth() / 4f);
         exitButton.setY(displayMetrics.widthPixels() / 12f);
-        exitButton.setUserObject("exit");
+        exitButton.setUserObject(Action.MENU);
         exitButton.addListener(mClickListener);
         addActor(exitButton);
 
-        Button repeatLevelButton = new Button("П");
+        Button repeatLevelButton = new Button(displayMetrics, "П");
         repeatLevelButton.setColor(Color.FOREST);
         repeatLevelButton.setSize(displayMetrics.widthPixels() / 6f, displayMetrics.widthPixels() / 6f);
         repeatLevelButton.setX(displayMetrics.widthPixels() / 2f - repeatLevelButton.getWidth() / 2f);
         repeatLevelButton.setY(displayMetrics.widthPixels() / 12f);
-        repeatLevelButton.setUserObject("repeat");
+        repeatLevelButton.setUserObject(Action.REPEAT);
         repeatLevelButton.addListener(mClickListener);
         addActor(repeatLevelButton);
 
-        nextLevelButton = new Button("Н");
+        nextLevelButton = new Button(displayMetrics, "Н");
         nextLevelButton.setColor(Color.FOREST);
         nextLevelButton.setSize(displayMetrics.widthPixels() / 6f, displayMetrics.widthPixels() / 6f);
         nextLevelButton.setX(displayMetrics.widthPixels() / 2f + nextLevelButton.getWidth() / 2f + nextLevelButton.getWidth() / 4f);
         nextLevelButton.setY(displayMetrics.widthPixels() / 12f);
-        nextLevelButton.setUserObject("next");
+        nextLevelButton.setUserObject(Action.NEXT);
         nextLevelButton.addListener(mClickListener);
         addActor(nextLevelButton);
 
@@ -71,7 +72,7 @@ public class EndLevelMenu extends Stage {
             stars[i] = new Image(new Texture(Gdx.files.internal("star.png")));
             stars[i].setBounds(
                     displayMetrics.widthPixels() * (4 + 8 * i) / 30f,
-                    displayMetrics.heightPixels() - displayMetrics.widthPixels() * 6 / 30f - displayMetrics.widthPixels()  / 10f,
+                    displayMetrics.heightPixels() - displayMetrics.widthPixels() * 6 / 30f - displayMetrics.widthPixels() / 10f,
                     displayMetrics.widthPixels() * 6 / 30f,
                     displayMetrics.widthPixels() * 6 / 30f);
             addActor(stars[i]);
@@ -79,12 +80,12 @@ public class EndLevelMenu extends Stage {
         stars[1].setY(stars[1].getY() + displayMetrics.widthPixels() / 20f);
     }
 
-    public void showScore(int bestScore, int score, int starsCount) {
+    public void showScore(int bestScore, int score, StarExtensions.Star star) {
         bestScoreLabel.setText("Ваш лучший результат: " + bestScore + "\nВаш результат: " + score);
-        for (int i = 0; i < starsCount; i++) {
+        for (int i = 0; i < star.getInt(); i++) {
             stars[i].setDrawable(new TextureRegionDrawable(new Texture(Gdx.files.internal("star.png"))));
         }
-        for (int i = starsCount; i < 3; i++) {
+        for (int i = star.getInt(); i < 3; i++) {
             stars[i].setDrawable(new TextureRegionDrawable(new Texture(Gdx.files.internal("star_t.png"))));
         }
     }
@@ -94,7 +95,7 @@ public class EndLevelMenu extends Stage {
         public void clicked(InputEvent event, float x, float y) {
             super.clicked(event, x, y);
             if (actionListener != null) {
-                actionListener.onAction((String) event.getListenerActor().getUserObject());
+                actionListener.onAction((Action) event.getListenerActor().getUserObject());
             }
         }
     };
@@ -112,6 +113,12 @@ public class EndLevelMenu extends Stage {
     }
 
     public interface ActionListener {
-        void onAction(String id);
+        void onAction(Action action);
+    }
+
+    public enum Action {
+        MENU,
+        REPEAT,
+        NEXT
     }
 }

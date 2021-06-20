@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 
+import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
+
 public class PixmapExtensions {
     public static Pixmap rotatePixmapTo90(Pixmap srcPix) {
         final int width = srcPix.getWidth();
@@ -60,11 +62,11 @@ public class PixmapExtensions {
         return new Texture(pixmap);
     }
 
-    public static Pixmap getLevelBack(String textureName) {
+    public static Pixmap getLevelBack(DisplayMetrics displayMetrics, String textureName) {
         Texture texture = new Texture(Gdx.files.internal("sky.png"));
         texture.getTextureData().prepare();
         Pixmap src = texture.getTextureData().consumePixmap();
-        Pixmap pixmap = new Pixmap(width(), Gdx.graphics.getHeight(), Pixmap.Format.RGBA8888);
+        Pixmap pixmap = new Pixmap(displayMetrics.widthPixels(), displayMetrics.heightPixels(), Pixmap.Format.RGBA8888);
         pixmap.drawPixmap(src, 0, 0, src.getWidth(), src.getHeight(), 0, 0, pixmap.getWidth(), pixmap.getHeight());
         src.dispose();
         texture.dispose();
@@ -85,19 +87,25 @@ public class PixmapExtensions {
         return pixmap;
     }
 
-    public static Texture getLevelTypeMenuItem(String textureName, int imageWidth, int imageHeight) {
+    public static Texture getLevelTypeMenuItem(DisplayMetrics displayMetrics, String textureName, int imageWidth, int imageHeight) {
         Texture texture = new Texture(Gdx.files.internal("sky.png"));
         texture.getTextureData().prepare();
         Pixmap src = texture.getTextureData().consumePixmap();
-        Pixmap pixmap = new Pixmap(width(), imageHeight, Pixmap.Format.RGBA8888);
-        pixmap.drawPixmap(src, 0, 0, src.getWidth(), src.getHeight(), (width() - imageWidth) / 2, 0, imageWidth, imageHeight);
+        Pixmap pixmap = new Pixmap(displayMetrics.widthPixels(), imageHeight, Pixmap.Format.RGBA8888);
+        pixmap.drawPixmap(src, 0, 0, src.getWidth(), src.getHeight(), (displayMetrics.widthPixels() - imageWidth) / 2, 0, imageWidth, imageHeight);
         texture.dispose();
         src.dispose();
         texture = new Texture(Gdx.files.internal(textureName));
         texture.getTextureData().prepare();
         src = texture.getTextureData().consumePixmap();
-        pixmap.drawPixmap(src, 0, 0, src.getWidth(), src.getHeight(),
-                (width() - imageWidth) / 2, imageHeight - imageWidth * src.getHeight() / src.getWidth(), imageWidth,
+        pixmap.drawPixmap(src,
+                0,
+                0,
+                src.getWidth(),
+                src.getHeight(),
+                (displayMetrics.widthPixels() - imageWidth) / 2,
+                imageHeight - imageWidth * src.getHeight() / src.getWidth(),
+                imageWidth,
                 imageWidth * src.getHeight() / src.getWidth());
         texture.dispose();
         src.dispose();

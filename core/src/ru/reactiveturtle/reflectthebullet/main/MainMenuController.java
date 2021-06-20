@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.base.Stage;
+import ru.reactiveturtle.reflectthebullet.level.LevelStoreData;
 import ru.reactiveturtle.reflectthebullet.level.LevelsMenu;
 import ru.reactiveturtle.reflectthebullet.level.LevelsTypeMenu;
 import ru.reactiveturtle.reflectthebullet.level.LevelType;
@@ -99,13 +100,13 @@ public class MainMenuController extends Stage {
             }
 
             @Override
-            public void onLevelClick(String levelFile) {
+            public void onLevelClick(LevelStoreData levelStoreData) {
                 selectedStage = mMainMenu;
                 mMenuTable.setText(MenuTable.Text.MAIN_MENU);
                 mMenuBack.setMenuBackground();
                 Gdx.input.setInputProcessor(mMainMenu);
                 if (mActionListener != null) {
-                    mActionListener.onLoadLevel(levelFile);
+                    mActionListener.onLoadLevel(levelStoreData);
                 }
             }
         });
@@ -142,6 +143,7 @@ public class MainMenuController extends Stage {
     private void initBackMusic() {
         mMenuBackMusic = Gdx.audio.newMusic(Gdx.files.internal("music/game_theme.mp3"));
         mMenuBackMusic.setLooping(true);
+        System.out.println(mMenuBackMusic);
         mMenuBackMusic.setVolume(getGameContext().getSettings().getMusicVolume());
     }
 
@@ -202,7 +204,7 @@ public class MainMenuController extends Stage {
     public interface ActionListener {
         void onPlay();
 
-        void onLoadLevel(String levelFile);
+        void onLoadLevel(LevelStoreData levelStoreData);
 
         void onExit();
     }
