@@ -1,21 +1,35 @@
 package ru.reactiveturtle.reflectthebullet.base.repository;
 
+import org.json.JSONObject;
+
+import java.io.File;
 import java.util.List;
 
+import ru.reactiveturtle.reflectthebullet.level.LastLevelData;
 import ru.reactiveturtle.reflectthebullet.level.LevelData;
-import ru.reactiveturtle.reflectthebullet.level.LevelStoreData;
+import ru.reactiveturtle.reflectthebullet.level.LevelRequirements;
 import ru.reactiveturtle.reflectthebullet.level.LevelType;
 
 public interface LevelRepositoryImpl {
-    void setLastLevel(LevelStoreData levelStoreData);
+    File getAppDataDirectory();
 
-    LevelStoreData getLastLevel();
+    void setLastLevelData(LastLevelData lastLevelData);
 
-    List<LevelData> getLevels(LevelType levelType);
+    LastLevelData getLastLevelData();
 
-    void setLevelData(LevelStoreData levelStoreData, int score, boolean isFinished);
+    List<String> getLevelDirectoriesList(LevelType levelType);
 
-    LevelData getLevelData(String levelFile);
+    List<LevelData> getLevelDataList(LevelType levelType);
 
-    LevelData getNextLevel(String levelFile);
+    List<LevelRequirements> getLevelRequirementsList(LevelType levelType);
+
+    void setLevelData(String relativeLevelDirectory, int score, boolean isFinished);
+
+    LevelData getLevelData(String relativeLevelDirectory);
+
+    LevelRequirements getLevelRequirements(String relativeLevelDirectory);
+
+    String getNextLevelDirectory(String relativeLevelDirectory);
+
+    JSONObject getLevelStructure(String relativeLevelDirectory);
 }

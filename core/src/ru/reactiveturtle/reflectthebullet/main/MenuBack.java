@@ -9,16 +9,18 @@ import com.badlogic.gdx.utils.Disposable;
 
 import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
 import ru.reactiveturtle.reflectthebullet.base.Drawable;
+import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.toolkit.PixmapExtensions;
 import ru.reactiveturtle.reflectthebullet.level.LevelType;
 
 public class MenuBack implements Drawable, Disposable {
     private Sprite mMenuBack;
     private Texture mMenuBackTexture;
-    private DisplayMetrics displayMetrics;
+    private GameContext gameContext;
 
-    public MenuBack(DisplayMetrics displayMetrics) {
-        this.displayMetrics = displayMetrics;
+    public MenuBack(GameContext gameContext) {
+        DisplayMetrics displayMetrics = gameContext.getDisplayMetrics();
+        this.gameContext = gameContext;
         Texture texture = new Texture(Gdx.files.internal("sky.png"));
         texture.getTextureData().prepare();
         Pixmap src = texture.getTextureData().consumePixmap();
@@ -55,13 +57,15 @@ public class MenuBack implements Drawable, Disposable {
                 textureName = "desert_back.png";
                 break;
             case CELT:
-                textureName = "country_back.png";
+                textureName = "celt_back.png";
                 break;
             default:
                 throw new EnumConstantNotPresentException(LevelType.class, levelType.name());
         }
+        DisplayMetrics displayMetrics = gameContext.getDisplayMetrics();
         mMenuBack.setTexture(new Texture(PixmapExtensions.castShadow(
-                PixmapExtensions.getLevelBack(displayMetrics, textureName), 0.5f)));
+                PixmapExtensions.getLevelBack(displayMetrics,
+                        gameContext.getTextureLoader().getTexture(textureName)), 0.5f)));
     }
 
     public void setMenuBackground() {

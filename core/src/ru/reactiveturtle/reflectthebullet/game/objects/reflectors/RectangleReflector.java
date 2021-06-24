@@ -11,11 +11,11 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import ru.reactiveturtle.reflectthebullet.Helper;
 import ru.reactiveturtle.reflectthebullet.base.GameContext;
-import ru.reactiveturtle.reflectthebullet.game.objects.Physical;
-import ru.reactiveturtle.reflectthebullet.game.objects.StaticObject;
 
-public class RectangleReflector extends Reflector implements StaticObject, Physical {
-    public RectangleReflector(GameContext gameContext, World world, Texture texture) {
+public class RectangleReflector extends Reflector {
+    public RectangleReflector(GameContext gameContext,
+                              World world,
+                              Texture texture) {
         super(gameContext, world, texture);
         setOrigin(0, 0);
     }
@@ -57,10 +57,5 @@ public class RectangleReflector extends Reflector implements StaticObject, Physi
         pixmap.setColor(Color.BROWN);
         pixmap.fillRectangle(0, 0, 100, 100);
         return pixmap;
-    }
-
-    @Override
-    public Physical getPhysical() {
-        return this;
     }
 }

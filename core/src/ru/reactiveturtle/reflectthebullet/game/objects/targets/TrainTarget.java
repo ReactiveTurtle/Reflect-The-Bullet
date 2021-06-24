@@ -2,8 +2,6 @@ package ru.reactiveturtle.reflectthebullet.game.objects.targets;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -13,10 +11,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import ru.reactiveturtle.reflectthebullet.Helper;
 import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.game.objects.Entity;
-import ru.reactiveturtle.reflectthebullet.game.objects.Physical;
-import ru.reactiveturtle.reflectthebullet.game.objects.StaticObject;
 
-public class TrainTarget extends Entity implements StaticObject, Physical {
+public class TrainTarget extends Entity {
     public TrainTarget(GameContext gameContext,
                        World world,
                        float width,
@@ -64,10 +60,5 @@ public class TrainTarget extends Entity implements StaticObject, Physical {
         pixmap.setColor(Color.PURPLE);
         pixmap.fillRectangle(0, 0, 100, 100);
         return pixmap;
-    }
-
-    @Override
-    public Physical getPhysical() {
-        return this;
     }
 }

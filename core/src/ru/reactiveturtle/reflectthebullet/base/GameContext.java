@@ -6,17 +6,16 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
-import java.util.Objects;
-
 import ru.reactiveturtle.reflectthebullet.base.loader.LevelLoader;
 import ru.reactiveturtle.reflectthebullet.base.loader.SoundLoader;
 import ru.reactiveturtle.reflectthebullet.base.loader.TextureLoader;
 import ru.reactiveturtle.reflectthebullet.base.repository.LevelRepositoryImpl;
 import ru.reactiveturtle.reflectthebullet.general.GameData;
 import ru.reactiveturtle.reflectthebullet.game.GameScreen;
-import ru.reactiveturtle.reflectthebullet.level.LevelStoreData;
+import ru.reactiveturtle.reflectthebullet.level.LastLevelData;
 import ru.reactiveturtle.reflectthebullet.main.MainMenuController;
 import ru.reactiveturtle.reflectthebullet.main.settings.Settings;
+import ru.reactiveturtle.reflectthebullet.toolkit.Objects;
 
 public class GameContext extends ApplicationAdapter {
     private TextureLoader mTextureLoader;
@@ -33,9 +32,10 @@ public class GameContext extends ApplicationAdapter {
     private OrthographicCamera mCamera;
 
     public GameContext(AppProviderImpl appProvider) {
+        this.mAppProvider = appProvider;
         mTextureLoader = new TextureLoader();
         mSoundLoader = new SoundLoader();
-        this.mAppProvider = appProvider;
+        mLevelLoader = new LevelLoader();
         mDisplayMetrics = new DisplayMetrics();
     }
 
@@ -56,8 +56,8 @@ public class GameContext extends ApplicationAdapter {
             }
 
             @Override
-            public void onLoadLevel(LevelStoreData levelStoreData) {
-                getLevelRepository().setLastLevel(levelStoreData);
+            public void onLoadLevel(String relativeLevelDirectory) {
+                getLevelRepository().setLastLevelData(new LastLevelData(relativeLevelDirectory));
                 mMainMenuController.hide();
 
                 mGameScreen.loadCurrentLevel();
@@ -156,6 +156,6 @@ public class GameContext extends ApplicationAdapter {
     }
 
     public LevelLoader getLevelLoader() {
-        return null;
+        return mLevelLoader;
     }
 }

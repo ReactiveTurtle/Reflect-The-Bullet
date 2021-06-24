@@ -1,10 +1,11 @@
 {
+    "textureName": "desert_back.png",
     "reflectors": [
         {
             "type": "RECTANGLE",
             "texture": "sand_block.png",
-            "x": 0,
-            "y": 0
+            "x": 5,
+            "y": 5
         }
     ]
 }

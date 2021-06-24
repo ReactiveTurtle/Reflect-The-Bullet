@@ -11,10 +11,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.game.objects.Entity;
-import ru.reactiveturtle.reflectthebullet.game.objects.Physical;
-import ru.reactiveturtle.reflectthebullet.game.objects.StaticObject;
 
-public class TriangleReflector extends Entity implements StaticObject, Physical {
+public class TriangleReflector extends Entity {
     public TriangleReflector(GameContext gameContext, World world, float width, float height, Texture texture) {
         super(gameContext, world, texture);
         setSize(width, height);
@@ -52,10 +50,5 @@ public class TriangleReflector extends Entity implements StaticObject, Physical 
         pixmap.setColor(Color.GRAY);
         pixmap.fillRectangle(0, 0, 100, 100);
         return pixmap;
-    }
-
-    @Override
-    public Physical getPhysical() {
-        return this;
     }
 }

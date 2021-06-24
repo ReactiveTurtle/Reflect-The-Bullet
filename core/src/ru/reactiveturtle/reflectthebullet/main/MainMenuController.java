@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.base.Stage;
-import ru.reactiveturtle.reflectthebullet.level.LevelStoreData;
 import ru.reactiveturtle.reflectthebullet.level.LevelsMenu;
 import ru.reactiveturtle.reflectthebullet.level.LevelsTypeMenu;
 import ru.reactiveturtle.reflectthebullet.level.LevelType;
@@ -35,7 +34,7 @@ public class MainMenuController extends Stage {
 
     public MainMenuController(final GameContext gameContext) {
         super(gameContext);
-        mMenuBack = new MenuBack(gameContext.getDisplayMetrics());
+        mMenuBack = new MenuBack(gameContext);
         mMenuTable = new MenuTable(gameContext.getDisplayMetrics());
 
         mSpriteBatch = new SpriteBatch();
@@ -80,7 +79,7 @@ public class MainMenuController extends Stage {
                         mMenuTable.setText(MenuTable.Text.valueOf(action.toString()));
                         LevelType levelType = LevelTypeMapper.map(action);
                         mMenuBack.setBackground(levelType);
-                        mLevelsMenu.showLevels(levelType, getGameContext().getLevelRepository().getLevels(levelType));
+                        mLevelsMenu.showLevels(levelType);
                         Gdx.input.setInputProcessor(mLevelsMenu);
                         break;
                 }
@@ -94,19 +93,20 @@ public class MainMenuController extends Stage {
                     case ESCAPE:
                         selectedStage = mLevelsTypeMenu;
                         mMenuTable.setText(MenuTable.Text.LEVELS);
+                        mMenuBack.setMenuBackground();
                         Gdx.input.setInputProcessor(mLevelsTypeMenu);
                         break;
                 }
             }
 
             @Override
-            public void onLevelClick(LevelStoreData levelStoreData) {
+            public void onLevelClick(String relativeLevelDirectory) {
                 selectedStage = mMainMenu;
                 mMenuTable.setText(MenuTable.Text.MAIN_MENU);
                 mMenuBack.setMenuBackground();
                 Gdx.input.setInputProcessor(mMainMenu);
                 if (mActionListener != null) {
-                    mActionListener.onLoadLevel(levelStoreData);
+                    mActionListener.onLoadLevel(relativeLevelDirectory);
                 }
             }
         });
@@ -204,7 +204,7 @@ public class MainMenuController extends Stage {
     public interface ActionListener {
         void onPlay();
 
-        void onLoadLevel(LevelStoreData levelStoreData);
+        void onLoadLevel(String relativeLevelDirectory);
 
         void onExit();
     }

@@ -62,15 +62,14 @@ public class PixmapExtensions {
         return new Texture(pixmap);
     }
 
-    public static Pixmap getLevelBack(DisplayMetrics displayMetrics, String textureName) {
-        Texture texture = new Texture(Gdx.files.internal("sky.png"));
-        texture.getTextureData().prepare();
-        Pixmap src = texture.getTextureData().consumePixmap();
+    public static Pixmap getLevelBack(DisplayMetrics displayMetrics, Texture texture) {
+        Texture skyTexture = new Texture(Gdx.files.internal("sky.png"));
+        skyTexture.getTextureData().prepare();
+        Pixmap src = skyTexture.getTextureData().consumePixmap();
         Pixmap pixmap = new Pixmap(displayMetrics.widthPixels(), displayMetrics.heightPixels(), Pixmap.Format.RGBA8888);
         pixmap.drawPixmap(src, 0, 0, src.getWidth(), src.getHeight(), 0, 0, pixmap.getWidth(), pixmap.getHeight());
         src.dispose();
-        texture.dispose();
-        texture = new Texture(Gdx.files.internal(textureName));
+        skyTexture.dispose();
         texture.getTextureData().prepare();
         src = texture.getTextureData().consumePixmap();
         pixmap.drawPixmap(src, 0, 0, src.getWidth(), src.getHeight(),

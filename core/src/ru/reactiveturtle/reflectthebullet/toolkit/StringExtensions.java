@@ -9,7 +9,7 @@ public final class StringExtensions {
         for (int i = 0; i < strings.length; i++) {
             String str = strings[i];
             stringBuilder.append(str);
-            if (i == strings.length - 1){
+            if (i != strings.length - 1){
                 stringBuilder.append(separator);
             }
         }

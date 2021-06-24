@@ -29,15 +29,18 @@ import ru.reactiveturtle.reflectthebullet.toolkit.FileUtils;
 public class MainWorld implements GameWorld, Keeper {
     private GameScreen mGameScreen;
     private World mWorld;
+    private Level mLoadedLevel;
     private String mLoadedLocation = "unknown";
 
-    private List<Sprite> mBackList = new ArrayList<Sprite>();
+    private List<Sprite> mBackList = new ArrayList<>();
     private List<Renderable> mRenderables = new ArrayList<>();
 
     private Revolver mRevolver;
     private Sprite mAim;
     private Bullet mBullet;
     private ParticleEffect mSparks;
+    private int mScore;
+    private int mBestScore;
 
     private List<Reflector> mReflectors = new ArrayList<>();
 
@@ -82,8 +85,8 @@ public class MainWorld implements GameWorld, Keeper {
     public void loadLevel(String levelFile) {
         try {
             mLoadedLocation = levelFile;
-            Level level = mGameScreen.getGameContext().getLevelLoader()
-                    .load(mGameScreen.getGameContext(), mWorld, FileUtils.getFileObject(mLoadedLocation));
+            mLoadedLevel = mGameScreen.getGameContext().getLevelLoader()
+                    .load(mGameScreen.getGameContext(), mWorld, levelFile);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -107,9 +110,11 @@ public class MainWorld implements GameWorld, Keeper {
     @Override
     public void drawObjects(SpriteBatch spriteBatch) {
         DisplayMetrics displayMetrics = mGameScreen.getGameContext().getDisplayMetrics();
+        mLoadedLevel.draw();
+        spriteBatch.begin();
         if (mBullet != null) {
             mBullet.syncSprite(displayMetrics.getOneMeterPixels());
-            if (Helper.isVisibleInScreen(mBullet.getSprite(), displayMetrics.widthPixels(), displayMetrics.widthPixels()) &&
+            if (Helper.isVisibleInScreen(mBullet.getSprite(), displayMetrics.widthPixels(), displayMetrics.heightPixels()) &&
                     mBullet.getBody().isAwake() &&
                     mBullet.getBody().getUserData() != null &&
                     (Math.abs(mBullet.getBody().getLinearVelocity().x) > 0.01f)) {
@@ -131,6 +136,7 @@ public class MainWorld implements GameWorld, Keeper {
         mSparks.draw(spriteBatch);
         mSparks.update(Gdx.graphics.getDeltaTime());
         mAim.draw(spriteBatch);
+        spriteBatch.end();
     }
 
     @Override

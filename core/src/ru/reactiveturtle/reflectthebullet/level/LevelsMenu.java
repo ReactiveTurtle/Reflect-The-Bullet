@@ -31,7 +31,7 @@ public class LevelsMenu extends Stage {
         return super.keyDown(keyCode);
     }
 
-    public void showLevels(LevelType levelType, List<LevelData> levelDataList) {
+    public void showLevels(LevelType levelType) {
         clear();
 
         DisplayMetrics displayMetrics = getGameContext().getDisplayMetrics();
@@ -43,11 +43,30 @@ public class LevelsMenu extends Stage {
         int levelBoxSize = (int) (displayMetrics.widthPixels() / 4f);
         int space = (int) (levelBoxSize / 4f);
         Color color = getLevelTypeColor(levelType);
+        List<String> levelDirectoriesList = getGameContext().getLevelRepository()
+                .getLevelDirectoriesList(levelType);
+        List<LevelData> levelDataList = getGameContext().getLevelRepository().getLevelDataList(levelType);
+        List<LevelRequirements> levelRequirementsList = getGameContext().getLevelRepository()
+                .getLevelRequirementsList(levelType);
         for (int i = 0; i < levelDataList.size() / 3f; i++) {
             for (int j = 0; j < (levelDataList.size() / 3 == i ? levelDataList.size() % 3 : 3); j++) {
-                LevelData levelData = levelDataList.get(i * 3 + j);
-                mLevelBoxes.add(new LevelBox(this, levelType, color,
-                        levelData, i, j, levelBoxSize, space, mClickListener));
+                int rectifiedIndex = i * 3 + j;
+                String levelDirectory = levelDirectoriesList.get(rectifiedIndex);
+                LevelData levelData = levelDataList.get(rectifiedIndex);
+                LevelRequirements levelRequirements = levelRequirementsList.get(rectifiedIndex);
+                mLevelBoxes.add(new LevelBox(
+                        this,
+                        levelType,
+                        color,
+                        levelDirectory,
+                        levelRequirements,
+                        levelData,
+                        isLevelAvailable(levelRequirements, levelData),
+                        i,
+                        j,
+                        levelBoxSize,
+                        space,
+                        mClickListener));
             }
         }
     }
@@ -64,13 +83,15 @@ public class LevelsMenu extends Stage {
 
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-            mLevelBoxes.get(Integer.parseInt(((String) event.getListenerActor().getUserObject()).split("&")[1]) - 1).press();
+            LevelBox.LevelBoxData levelBoxData = (LevelBox.LevelBoxData) event.getListenerActor().getUserObject();
+            mLevelBoxes.get(levelBoxData.getId()).press();
             return super.touchDown(event, x, y, pointer, button);
         }
 
         @Override
         public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-            mLevelBoxes.get(Integer.parseInt(((String) event.getListenerActor().getUserObject()).split("&")[1]) - 1).release();
+            LevelBox.LevelBoxData levelBoxData = (LevelBox.LevelBoxData) event.getListenerActor().getUserObject();
+            mLevelBoxes.get(levelBoxData.getId()).release();
             System.out.println("touch up");
             super.touchUp(event, x, y, pointer, button);
         }
@@ -78,9 +99,10 @@ public class LevelsMenu extends Stage {
         @Override
         public void clicked(InputEvent event, float x, float y) {
             super.clicked(event, x, y);
-            mLevelBoxes.get(Integer.parseInt(((String) event.getListenerActor().getUserObject()).split("&")[1]) - 1).release();
+            LevelBox.LevelBoxData levelBoxData = (LevelBox.LevelBoxData) event.getListenerActor().getUserObject();
+            mLevelBoxes.get(levelBoxData.getId()).release();
             if (actionListener != null) {
-                actionListener.onLevelClick((LevelStoreData) event.getListenerActor().getUserObject());
+                actionListener.onLevelClick(levelBoxData.getRelativeLevelDirectory());
             }
         }
     };
@@ -92,7 +114,7 @@ public class LevelsMenu extends Stage {
     public interface ActionListener {
         void onAction(Action action);
 
-        void onLevelClick(LevelStoreData levelStoreData);
+        void onLevelClick(String relativeLevelDirectory);
     }
 
     private Color getLevelTypeColor(LevelType levelType) {
@@ -106,6 +128,20 @@ public class LevelsMenu extends Stage {
         return Color.GRAY;
     }
 
+    private boolean isLevelAvailable(LevelRequirements levelRequirements, LevelData levelData) {
+        if (levelData.isFinished()) {
+            return true;
+        }
+        String[] requiredLevelDirectories = levelRequirements.getRequiredLevelFiles();
+        for (String relativeDirectory : requiredLevelDirectories) {
+            LevelData requiredLevelData = getGameContext().getLevelRepository()
+                    .getLevelData(relativeDirectory);
+            if (!requiredLevelData.isFinished()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public enum Action {
         ESCAPE

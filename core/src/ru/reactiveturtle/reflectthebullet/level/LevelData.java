@@ -1,29 +1,24 @@
 package ru.reactiveturtle.reflectthebullet.level;
 
+import org.json.JSONObject;
+
 import ru.reactiveturtle.reflectthebullet.toolkit.JSONSerializable;
 
 public class LevelData implements JSONSerializable {
-    private LevelStoreData levelStoreData;
-    private LevelRequirements requirements;
+    private final LevelType levelType;
+    private final boolean isFinished;
+    private final int bestScore;
 
-    private boolean isFinished;
-    private int bestScore;
-
-    public LevelData(LevelStoreData levelStoreData, LevelRequirements requirements,
+    public LevelData(LevelType levelType,
                      int bestScore,
                      boolean isFinished) {
-        this.levelStoreData = levelStoreData;
-        this.requirements = requirements;
+        this.levelType = levelType;
         this.isFinished = isFinished;
         this.bestScore = bestScore;
     }
 
-    public LevelStoreData getLevelStoreData() {
-        return levelStoreData;
-    }
-
-    public LevelRequirements getRequirements() {
-        return requirements;
+    public LevelType getLevelType() {
+        return levelType;
     }
 
     public boolean isFinished() {
@@ -36,6 +31,19 @@ public class LevelData implements JSONSerializable {
 
     @Override
     public String serialize() {
-        return null;
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("levelType", levelType.toString());
+        jsonObject.put("bestScore", bestScore);
+        jsonObject.put("isFinished", isFinished);
+        return jsonObject.toString();
+    }
+
+    public static LevelData deserialize(String serialized) {
+        JSONObject jsonObject = new JSONObject(serialized);
+        return new LevelData(
+                LevelType.valueOf(jsonObject.getString("levelType")),
+                jsonObject.getInt("bestScore"),
+                jsonObject.getBoolean("isFinished")
+        );
     }
 }

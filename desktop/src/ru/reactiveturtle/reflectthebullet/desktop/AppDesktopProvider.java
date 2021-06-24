@@ -3,12 +3,12 @@ package ru.reactiveturtle.reflectthebullet.desktop;
 import java.io.File;
 
 import ru.reactiveturtle.reflectthebullet.base.AppProviderImpl;
+import ru.reactiveturtle.reflectthebullet.base.repository.LevelRepository;
 import ru.reactiveturtle.reflectthebullet.base.repository.LevelRepositoryImpl;
 import ru.reactiveturtle.reflectthebullet.base.repository.SettingsRepositoryImpl;
 
 import static ru.reactiveturtle.reflectthebullet.toolkit.FileUtils.getFileObject;
 import static ru.reactiveturtle.reflectthebullet.toolkit.FileUtils.createDirectory;
-import static ru.reactiveturtle.reflectthebullet.toolkit.FileUtils.throwFileInitializingError;
 
 public class AppDesktopProvider implements AppProviderImpl {
     private final String appDataPath;
@@ -40,9 +40,7 @@ public class AppDesktopProvider implements AppProviderImpl {
 
     private File tryInitAppDirectory() {
         File appDirectory = new File(appDataPath, DesktopLauncher.APP_NAME);
-        if (!createDirectory(appDirectory)) {
-            throwFileInitializingError(appDirectory);
-        }
+        createDirectory(appDirectory);
         return appDirectory;
     }
 }

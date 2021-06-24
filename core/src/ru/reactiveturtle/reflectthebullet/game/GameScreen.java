@@ -20,8 +20,9 @@ import ru.reactiveturtle.reflectthebullet.base.DisplayMetrics;
 import ru.reactiveturtle.reflectthebullet.base.GameContext;
 import ru.reactiveturtle.reflectthebullet.base.repository.LevelRepositoryImpl;
 import ru.reactiveturtle.reflectthebullet.base.Stage;
+import ru.reactiveturtle.reflectthebullet.level.LastLevelData;
 import ru.reactiveturtle.reflectthebullet.level.LevelData;
-import ru.reactiveturtle.reflectthebullet.level.LevelStoreData;
+import ru.reactiveturtle.reflectthebullet.level.LevelRequirements;
 import ru.reactiveturtle.reflectthebullet.level.StarExtensions;
 import ru.reactiveturtle.reflectthebullet.main.settings.SettingsMenu;
 import ru.reactiveturtle.reflectthebullet.level.world.GameWorld;
@@ -206,9 +207,9 @@ public class GameScreen extends Stage {
                         break;
                     case NEXT:
                         LevelRepositoryImpl levelRepositoryImpl = gameContext.getLevelRepository();
-                        LevelStoreData levelStoreData = levelRepositoryImpl.getLastLevel();
-                        LevelData levelData = levelRepositoryImpl.getNextLevel(levelStoreData.getLevelFile());
-                        levelRepositoryImpl.setLastLevel(levelData.getLevelStoreData());
+                        LastLevelData lastLevelData = levelRepositoryImpl.getLastLevelData();
+                        String nextLevelDirectory = levelRepositoryImpl.getNextLevelDirectory(lastLevelData.getLastLevelDirectory());
+                        levelRepositoryImpl.setLastLevelData(new LastLevelData(nextLevelDirectory));
                         loadCurrentLevel();
                         start();
                         break;
@@ -260,15 +261,17 @@ public class GameScreen extends Stage {
 
     public void loadCurrentLevel() {
         mMainWorld.dispose();
-        LevelStoreData levelStoreData = getGameContext().getLevelRepository().getLastLevel();
-        if (!mMainWorld.getLoadedLocation().equals(levelStoreData.getLevelFile())) {
+        LevelRepositoryImpl levelRepository = getGameContext().getLevelRepository();
+        LastLevelData lastLevelData = getGameContext().getLevelRepository().getLastLevelData();
+        LevelData levelData = levelRepository.getLevelData(lastLevelData.getLastLevelDirectory());
+        if (!mMainWorld.getLoadedLocation().equals(lastLevelData.getLastLevelDirectory())) {
             if (mLevelMusic != null) {
                 mLevelMusic.dispose();
             }
-            mLevelMusic = Helper.loadLevelMusic(getGameContext().getLevelRepository().getLastLevel().getLevelType());
+            mLevelMusic = Helper.loadLevelMusic(levelData.getLevelType());
             startMusic();
         }
-        mMainWorld.loadLevel(levelStoreData.getLevelFile());
+        mMainWorld.loadLevel(lastLevelData.getLastLevelDirectory());
         mScoreStage.updateBestScore(0);
 
         updateBulletsCount();
@@ -284,12 +287,10 @@ public class GameScreen extends Stage {
             mSpriteBatch.begin();
             mMainWorld.drawBackground(mSpriteBatch);
             mSpriteBatch.end();
+            mMainWorld.drawObjects(mSpriteBatch);
 
             mScoreStage.draw();
 
-            mSpriteBatch.begin();
-            mMainWorld.drawObjects(mSpriteBatch);
-            mSpriteBatch.end();
             //renderer.render(mMainWorld.getWorld(), CAMERA.combined);
             if (isPause) {
                 mSpriteBatch.begin();
@@ -312,19 +313,23 @@ public class GameScreen extends Stage {
                     mEndLevelMenu.draw();
                     if (Gdx.input.getInputProcessor().hashCode() != mEndLevelMenu.hashCode()) {
                         LevelRepositoryImpl levelRepository = getGameContext().getLevelRepository();
-                        LevelStoreData levelStoreData = levelRepository.getLastLevel();
-                        LevelData levelData = levelRepository.getLevelData(levelStoreData.getLevelFile());
-                        LevelData nextLevel = levelRepository.getNextLevel(levelStoreData.getLevelFile());
-                        if ((levelData.isFinished() || mMainWorld.getBestScore() >= levelData.getRequirements().getFirstStarScore()) && nextLevel != null) {
+                        LastLevelData lastLevelData = levelRepository.getLastLevelData();
+                        LevelData levelData = levelRepository.getLevelData(lastLevelData.getLastLevelDirectory());
+                        LevelRequirements levelRequirements = levelRepository.getLevelRequirements(lastLevelData.getLastLevelDirectory());
+                        String nextLevelDirectory = levelRepository.getNextLevelDirectory(
+                                lastLevelData.getLastLevelDirectory());
+
+                        if ((levelData.isFinished() || mMainWorld.getBestScore() >= levelRequirements.getFirstStarScore()) && nextLevelDirectory != null) {
                             mEndLevelMenu.enableNextLevelButton();
                         } else {
                             mEndLevelMenu.disableNextLevelButton();
                         }
-                        levelRepository.setLevelData(levelData.getLevelStoreData(),
+                        levelRepository.setLevelData(lastLevelData.getLastLevelDirectory(),
                                 Math.max(levelData.getBestScore(), mMainWorld.getBestScore()),
-                                levelData.isFinished() || mMainWorld.getBestScore() >= levelRepository.getLevelData(levelData.getLevelStoreData().getLevelFile()).getRequirements().getFirstStarScore());
-                        mEndLevelMenu.showScore(levelRepository.getLevelData(levelData.getLevelStoreData().getLevelFile()).getBestScore(),
-                                mMainWorld.getBestScore(), StarExtensions.getStars(mMainWorld.getBestScore(), levelData.getRequirements()));
+                                levelData.isFinished() || mMainWorld.getBestScore() >= levelRepository.getLevelRequirements(lastLevelData.getLastLevelDirectory()).getFirstStarScore());
+                        mEndLevelMenu.showScore(levelRepository.getLevelData(lastLevelData.getLastLevelDirectory()).getBestScore(),
+                                mMainWorld.getBestScore(),
+                                StarExtensions.getStars(mMainWorld.getBestScore(), levelRequirements));
                         pause();
                         Gdx.input.setInputProcessor(mEndLevelMenu);
                     }

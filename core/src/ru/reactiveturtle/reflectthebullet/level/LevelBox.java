@@ -27,7 +27,10 @@ public class LevelBox {
     public LevelBox(Stage stage,
                     LevelType levelType,
                     Color levelTypeColor,
+                    String levelDirectory,
+                    LevelRequirements levelRequirements,
                     LevelData levelData,
+                    boolean isAvailable,
                     int i,
                     int j,
                     int levelBoxSize,
@@ -35,8 +38,7 @@ public class LevelBox {
                     ClickListener mClickListener) {
 
         DisplayMetrics displayMetrics = stage.getGameContext().getDisplayMetrics();
-
-        LevelStoreData levelStoreData = levelData.getLevelStoreData();
+        LevelBoxData levelBoxData = new LevelBoxData(i * 3 + j, levelDirectory);
 
         this.levelBoxSize = levelBoxSize;
         Color color = Color.BLACK;
@@ -50,21 +52,19 @@ public class LevelBox {
 
         Image background = new Image(new Texture(PixmapExtensions.getRoundRectPixmap(
                 levelTypeColor, 128, 128, 32)));
-        background.setUserObject(levelStoreData);
+        background.setUserObject(levelBoxData);
         background.setBounds(levelBoxSize / 4f + (levelBoxSize + space) * j,
                 Gdx.graphics.getHeight() - levelBoxSize / 4f - levelBoxSize * (i + 1) - space * i - displayMetrics.widthPixels() / 3f, levelBoxSize, levelBoxSize);
         stage.addActor(background);
         widgetList.add(background);
 
-        if (levelData.isFinished()) {
-            LevelRequirements levelRequirements = levelData.getRequirements();
-
+        if (isAvailable) {
             background.addListener(mClickListener);
             Image star = new Image(new Texture(Gdx.files.internal(levelData.getBestScore() < levelRequirements.getFirstStarScore() ? "star_t.png" : "star.png")));
             star.setBounds(background.getX() + levelBoxSize * 2 / 24f,
                     background.getY() + levelBoxSize * 1.85f / 3f,
                     levelBoxSize * 6 / 24f, levelBoxSize * 6 / 24f);
-            star.setUserObject(levelStoreData);
+            star.setUserObject(levelBoxData);
             star.addListener(mClickListener);
             stage.addActor(star);
             widgetList.add(star);
@@ -72,7 +72,7 @@ public class LevelBox {
             star = new Image(new Texture(Gdx.files.internal(levelData.getBestScore() < levelRequirements.getSecondStarScore() ? "star_t.png" : "star.png")));
             star.setBounds(background.getX() + levelBoxSize * 9 / 24f, background.getY() + levelBoxSize * 2 / 3f,
                     levelBoxSize * 6 / 24f, levelBoxSize * 6 / 24f);
-            star.setUserObject(levelStoreData);
+            star.setUserObject(levelBoxData);
             star.addListener(mClickListener);
             stage.addActor(star);
             widgetList.add(star);
@@ -81,7 +81,7 @@ public class LevelBox {
             star.setBounds(background.getX() + levelBoxSize * 16 / 24f,
                     background.getY() + levelBoxSize * 1.85f / 3f,
                     levelBoxSize * 6 / 24f, levelBoxSize * 6 / 24f);
-            star.setUserObject(levelStoreData);
+            star.setUserObject(levelBoxData);
             star.addListener(mClickListener);
             stage.addActor(star);
             widgetList.add(star);
@@ -94,7 +94,7 @@ public class LevelBox {
             Label label = new Label((i * 3 + j + 1) + "", labelStyle);
             label.setAlignment(Align.center);
             label.setBounds(background.getX(), background.getY(), background.getWidth(), background.getHeight() / 3f);
-            label.setUserObject(levelStoreData);
+            label.setUserObject(levelBoxData);
             label.addListener(mClickListener);
             stage.addActor(label);
             widgetList.add(label);
@@ -102,7 +102,7 @@ public class LevelBox {
             Label scoreLabel = new Label(levelData.getBestScore() + "", labelStyle);
             scoreLabel.setAlignment(Align.center);
             scoreLabel.setBounds(background.getX(), background.getY() + background.getHeight() / 4f, background.getWidth(), background.getHeight() / 3f);
-            scoreLabel.setUserObject(levelType);
+            scoreLabel.setUserObject(levelBoxData);
             scoreLabel.addListener(mClickListener);
             stage.addActor(scoreLabel);
             widgetList.add(scoreLabel);
@@ -141,5 +141,23 @@ public class LevelBox {
         }
         widgetList.clear();
         widgetList = null;
+    }
+
+    public static class LevelBoxData {
+        private final int id;
+        private final String relativeLevelDirectory;
+
+        public LevelBoxData(int id, String relativeLevelDirectory) {
+            this.id = id;
+            this.relativeLevelDirectory = relativeLevelDirectory;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getRelativeLevelDirectory() {
+            return relativeLevelDirectory;
+        }
     }
 }

@@ -3,6 +3,7 @@ package ru.reactiveturtle.reflectthebullet.game.objects;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 
@@ -11,12 +12,16 @@ import ru.reactiveturtle.reflectthebullet.base.GameContext;
 
 public abstract class Entity {
     private GameContext gameContext;
+    private World world;
     private Sprite mSprite;
     private Body mBody;
 
-    public Entity(GameContext gameContext, World world, Texture texture) {
+    public Entity(GameContext gameContext,
+                  World world,
+                  Texture texture) {
         super();
         this.gameContext = gameContext;
+        this.world = world;
         mSprite = new Sprite(texture);
         mSprite.setOriginCenter();
         mBody = createBody(world);
@@ -90,6 +95,10 @@ public abstract class Entity {
 
     public void setPosition(float x, float y) {
         mSprite.setPosition(x, y);
+        if (mBody != null) {
+            world.destroyBody(mBody);
+            mBody = createBody(world);
+        }
     }
 
     public void setRotation(float degrees) {
